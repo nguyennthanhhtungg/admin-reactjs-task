@@ -40,7 +40,8 @@
     "func-names": "off",
     "no-console": "off",
     "react/no-unescaped-entities": 0,
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }]
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react-hooks/exhaustive-deps": "off"
   },
   "settings": {
     "import/resolver": {
