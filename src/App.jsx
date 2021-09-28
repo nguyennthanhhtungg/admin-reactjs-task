@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import ScrollToTop from 'components/ScrollToTop/ScrollToTop';
 import Layout from 'components/Layout/Layout';
 import Dashboard from 'pages/Dashboard/Dashboard';
@@ -13,6 +13,9 @@ function App() {
       <ScrollToTop>
         <Layout>
           <Switch>
+            <Route exact path="/">
+              <Redirect to="/dashboard" />
+            </Route>
             <Route exact path="/dashboard">
               <Dashboard />
             </Route>
