@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Container from '@mui/material/Container';
 import AppBarProvider from './AppBar/AppBar';
 import SideBar from './SideBar/SideBar';
@@ -18,13 +18,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 function Layout(props) {
   const { children } = props;
   const [open, setOpen] = React.useState(true);
-  const [compact, setCompact] = useState(false);
+  const [compact, setCompact] = useState(true);
 
   const handleDrawerOpenToggle = () => {
     setOpen(!open);
   };
-
-  console.log(window.location.pathname);
 
   const handleDrawerCompactToggle = () => {
     setCompact(!compact);
