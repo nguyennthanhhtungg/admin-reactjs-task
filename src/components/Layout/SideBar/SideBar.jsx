@@ -19,6 +19,7 @@ import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import ListSubheader from '@mui/material/ListSubheader';
+import { useHistory } from 'react-router-dom';
 
 import logo from '../../../logo.svg';
 
@@ -86,7 +87,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar
 }));
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   logo: {
     width: '60px',
     height: '60px'
@@ -109,6 +110,15 @@ const useStyles = makeStyles((theme) => ({
 function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
   const theme = useTheme();
   const classes = useStyles();
+  const history = useHistory();
+
+  const handleRedirectToDashboardPage = () => {
+    history.push('/dashboard');
+  };
+
+  const handleRedirectToProductsPage = () => {
+    history.push('/products');
+  };
 
   return (
     <Drawer
@@ -120,10 +130,16 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
       <DrawerHeader compact={compact}>
         <img className={classes.logo} src={logo} alt="Logo" />
         <Typography
-          style={{ color: 'lightgray', fontWeight: 'bolder', fontFamily: 'Roboto' }}
+          style={{
+            color: 'lightgray',
+            fontWeight: 'bolder',
+            fontFamily: 'Roboto'
+          }}
+          onClick={handleRedirectToDashboardPage}
         >
           ADMIN REACT.JS
         </Typography>
+
         <IconButton onClick={handleDrawerCompactToggle}>
           {theme.direction === 'rtl' ? (
             <ChevronRightIcon className={classes.icon} />
@@ -134,7 +150,11 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
       </DrawerHeader>
       <Divider />
       <List sx={{ width: '100%', color: 'lightgray' }} disablePadding>
-        <ListItem button className={classes.listItem}>
+        <ListItem
+          button
+          className={classes.listItem}
+          onClick={handleRedirectToDashboardPage}
+        >
           <ListItemIcon>
             <DashboardIcon className={classes.icon} />
           </ListItemIcon>
@@ -153,23 +173,27 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
         }
         disablePadding
       >
-        <ListItem button className={classes.listItem}>
+        <ListItem
+          button
+          className={classes.listItem}
+          onClick={handleRedirectToProductsPage}
+        >
           <ListItemIcon>
             <AcUnitOutlinedIcon className={classes.icon} />
           </ListItemIcon>
-          <ListItemText primary="Product" />
+          <ListItemText primary="Products" />
         </ListItem>
         <ListItem button className={classes.listItem}>
           <ListItemIcon>
             <CategoryOutlinedIcon className={classes.icon} />
           </ListItemIcon>
-          <ListItemText primary="Category" />
+          <ListItemText primary="Categories" />
         </ListItem>
         <ListItem button className={classes.listItem}>
           <ListItemIcon>
             <LocationCityOutlinedIcon className={classes.icon} />
           </ListItemIcon>
-          <ListItemText primary="Company" />
+          <ListItemText primary="Companies" />
         </ListItem>
       </List>
       <Divider />
@@ -188,13 +212,13 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
           <ListItemIcon>
             <PeopleOutlinedIcon className={classes.icon} />
           </ListItemIcon>
-          <ListItemText primary="Customer" />
+          <ListItemText primary="Customers" />
         </ListItem>
         <ListItem button className={classes.listItem}>
           <ListItemIcon>
             <PeopleAltOutlinedIcon className={classes.icon} />
           </ListItemIcon>
-          <ListItemText primary="Employee" />
+          <ListItemText primary="Employees" />
         </ListItem>
       </List>
       <Divider />
@@ -210,7 +234,6 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
       {compact && (
         <List
           sx={{
-            width: '100%',
             color: 'lightgray',
             position: 'fixed',
             bottom: 0
