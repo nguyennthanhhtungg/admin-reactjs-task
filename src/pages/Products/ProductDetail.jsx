@@ -18,28 +18,22 @@ const useStyles = makeStyles(() => ({
     margin: 30
   },
   title: {
-    fontSize: 'larger',
     fontWeight: 'bolder',
-    marginTop: 10
+    marginTop: 10,
+    fontSize: 'large',
+    fontFamily: 'Roboto'
   },
   input: {
     padding: 10,
     marginLeft: 10,
     marginRight: 10,
-    fontSize: 'larger',
     width: '100%',
-    borderStyle: 'solid',
-    borderColor: '#3c4b64',
-    borderRadius: 10,
-    '&:focus': {
-      outline: 'none'
-    }
+    fontSize: 'large',
+    fontFamily: 'Roboto'
   },
   date: {
-    padding: 10,
     marginLeft: 10,
-    marginRight: 10,
-    fontSize: 'larger'
+    marginRight: 10
   }
 }));
 
@@ -56,33 +50,41 @@ function ProductDetail() {
 
   return (
     <div className={classes.root}>
-      <Typography variant="h5" style={{ fontWeight: 'bolder', textAlign: 'center' }}>
+      <Typography
+        variant="h4"
+        style={{
+          fontWeight: 'bolder',
+          textAlign: 'center',
+          color: 'blue',
+          fontFamily: 'Roboto'
+        }}
+      >
         PRODUCT DETAIL
       </Typography>
       <Box sx={{ flexGrow: 1, m: 1 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={3} />
           <Grid item xs={12} md={6}>
-            <Typography variant="h6" className={classes.title}>
-              Product Code (*)
+            <Typography variant="subtitle1" className={classes.title}>
+              1. Product Code (*)
             </Typography>
             <input
               placeholder="Enter Product Code"
               className={classes.input}
               required
             />
-            <Typography variant="h6" className={classes.title}>
-              Product Name (*)
+            <Typography variant="subtitle1" className={classes.title}>
+              2. Product Name (*)
             </Typography>
             <input
               placeholder="Enter Product Name"
               className={classes.input}
               required
             />
-            <Grid container spacing={3}>
+            <Grid container spacing={{ xs: 0, md: 3 }}>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" className={classes.title}>
-                  Price (*)
+                <Typography variant="subtitle1" className={classes.title}>
+                  3. Price (*)
                 </Typography>
                 <input
                   placeholder="Enter Price"
@@ -92,8 +94,8 @@ function ProductDetail() {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" className={classes.title}>
-                  Discount (*)
+                <Typography variant="subtitle1" className={classes.title}>
+                  4. Discount (*)
                 </Typography>
                 <input
                   placeholder="Enter Discount"
@@ -103,41 +105,42 @@ function ProductDetail() {
                 />
               </Grid>
             </Grid>
-
-            <Typography variant="h6" className={classes.title}>
-              Attached Gift
+            <Typography variant="subtitle1" className={classes.title}>
+              5. Attached Gift
             </Typography>
             <input
               placeholder="Enter Attached Gift"
               className={classes.input}
               required
             />
-            <Grid container spacing={3}>
+            <Grid container spacing={{ xs: 0, md: 3 }}>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" className={classes.title}>
-                  Weight (*)
+                <Typography variant="subtitle1" className={classes.title}>
+                  6. Weight (*)
                 </Typography>
                 <input
                   placeholder="Enter Weight"
+                  type="number"
                   className={classes.input}
                   required
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" className={classes.title}>
-                  Number (*)
+                <Typography variant="subtitle1" className={classes.title}>
+                  7. Number (*)
                 </Typography>
                 <input
                   placeholder="Enter Number"
+                  type="number"
                   className={classes.input}
                   required
                 />
               </Grid>
             </Grid>
-            <Grid container spacing={3}>
+            <Grid container spacing={{ xs: 0, md: 3 }}>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" className={classes.title}>
-                  Origin (*)
+                <Typography variant="subtitle1" className={classes.title}>
+                  8. Origin (*)
                 </Typography>
                 <input
                   placeholder="Enter Origin"
@@ -147,19 +150,24 @@ function ProductDetail() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <Typography variant="h6" className={classes.title}>
-                  Tax (*)
+                  9. Tax (*)
                 </Typography>
-                <input placeholder="Enter Tax" className={classes.input} required />
+                <input
+                  placeholder="Enter Tax"
+                  type="number"
+                  className={classes.input}
+                  required
+                />
               </Grid>
             </Grid>
           </Grid>
           <Grid item xs={12} md={3} />
           <Grid item xs={12} md={3} />
           <Grid item xs={12} md={6}>
-            <Grid container spacing={3}>
+            <Grid container spacing={{ xs: 0, md: 3 }}>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" className={classes.title}>
-                  Category Type (*)
+                <Typography variant="subtitle1" className={classes.title}>
+                  10. Category Type (*)
                 </Typography>
                 <select value={10} className={classes.input}>
                   <option value={10}>Quần</option>
@@ -169,69 +177,66 @@ function ProductDetail() {
                 </select>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Typography variant="h6" className={classes.title}>
-                  Supplier (*)
+                <Typography variant="subtitle1" className={classes.title}>
+                  11. Supplier (*)
                 </Typography>
                 <select value={10} className={classes.input}>
                   <option value={10}>Capgemini</option>
                 </select>
               </Grid>
-              <Grid item xs={12}>
-                <Typography variant="h6" className={classes.title}>
-                  Date of Manufacture (*)
-                </Typography>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateTimePicker
-                    renderInput={(props) => (
-                      <TextField className={classes.date} {...props} />
-                    )}
-                    value={value}
-                    onChange={(newValue) => {
-                      setValue(newValue);
-                    }}
-                  />
-                </LocalizationProvider>
-                <Typography variant="h6" className={classes.title}>
-                  Experiation Date (*)
-                </Typography>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateTimePicker
-                    renderInput={(props) => (
-                      <TextField className={classes.date} {...props} />
-                    )}
-                    value={value}
-                    onChange={(newValue) => {
-                      setValue(newValue);
-                    }}
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="h6" className={classes.title}>
-                  Image (*)
-                </Typography>
-                <input
-                  placeholder="Enter ImageUrl"
-                  className={classes.input}
-                  required
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" className={classes.title}>
+                12. Date of Manufacture (*)
+              </Typography>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DateTimePicker
+                  renderInput={(props) => (
+                    <TextField className={classes.date} {...props} />
+                  )}
+                  value={value}
+                  onChange={(newValue) => {
+                    setValue(newValue);
+                  }}
                 />
-                <div style={{ textAlign: 'center' }}>
-                  <img
-                    src="https://picsum.photos/250"
-                    alt="imageUrl"
-                    style={{ height: 250, width: 250 }}
-                  />
-                </div>
-              </Grid>
+              </LocalizationProvider>
+              <Typography variant="subtitle1" className={classes.title}>
+                13. Expiration Date (*)
+              </Typography>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DateTimePicker
+                  renderInput={(props) => (
+                    <TextField className={classes.date} {...props} />
+                  )}
+                  value={value}
+                  onChange={(newValue) => {
+                    setValue(newValue);
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" className={classes.title}>
+                14. Image (*)
+              </Typography>
+              <input type="file" className={classes.input} required />
+
+              <div style={{ textAlign: 'center' }}>
+                <img
+                  src="https://picsum.photos/250"
+                  alt="imageUrl"
+                  style={{ height: 250, width: 250 }}
+                />
+              </div>
             </Grid>
           </Grid>
           <Grid item xs={12} md={3} />
           <Grid item xs={12} md={6}>
-            <Typography variant="h6" className={classes.title}>
-              Short Description (*)
+            <Typography variant="subtitle1" className={classes.title}>
+              15. Short Description (*)
             </Typography>
             <Editor
-              editorStyle={{ border: '2px solid #3c4b64', height: 450 }}
+              editorStyle={{ border: '1px solid #3c4b64', height: 450 }}
               editorState={shortDescription}
               toolbarClassName="toolbarClassName"
               wrapperClassName="wrapperClassName"
@@ -240,11 +245,11 @@ function ProductDetail() {
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <Typography variant="h6" className={classes.title}>
-              Detail Description (*)
+            <Typography variant="subtitle1" className={classes.title}>
+              16. Detail Description (*)
             </Typography>
             <Editor
-              editorStyle={{ border: '2px solid #3c4b64', height: 450 }}
+              editorStyle={{ border: '1px solid #3c4b64', height: 450 }}
               // editorState={shortDescription}
               toolbarClassName="toolbarClassName"
               wrapperClassName="wrapperClassName"
