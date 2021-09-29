@@ -147,7 +147,7 @@ function Products() {
                     scope="row"
                     style={{ fontWeight: 'bolder' }}
                   >
-                    {10 * page + index + 1}
+                    {rowsPerPage * page + index + 1}
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     {product.productCode}
@@ -211,7 +211,7 @@ function Products() {
                   style={{
                     color: theme.palette.common.white
                   }}
-                  rowsPerPageOptions={[10, 25, 50, { label: 'All', value: -1 }]}
+                  rowsPerPageOptions={[10, 25, 50]}
                   count={productNumber}
                   rowsPerPage={rowsPerPage}
                   page={page}

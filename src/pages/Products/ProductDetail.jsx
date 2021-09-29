@@ -11,15 +11,14 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import TextField from '@mui/material/TextField';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useForm } from 'react-hook-form';
 import Helmet from 'react-helmet';
 import { useHistory, useParams } from 'react-router-dom';
-import { AppContext } from '../../contexts/AppContext';
-import axiosInstance from '../../utils/database';
+import { AppContext } from 'contexts/AppContext';
+import axiosInstance from 'utils/database';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -46,20 +45,19 @@ const useStyles = makeStyles(() => ({
 }));
 
 function ProductDetail() {
-  const classes = useStyles();
-  const history = useHistory();
   console.log('Hello ProductDetail');
 
+  const classes = useStyles();
+  const history = useHistory();
   const { id } = useParams();
   const [productImage, setProductImage] = useState(null);
-  const [manufactureDate, setManufactureDate] = React.useState(new Date());
-  const [expirationDate, setExpirationDate] = React.useState(new Date());
   const [shortDescription, setShortDescription] = React.useState(
     EditorState.createEmpty()
   );
   const [detailDescription, setDetailDescription] = React.useState(
     EditorState.createEmpty()
   );
+  const { enqueueSnackbar } = useSnackbar();
 
   const { store, dispatch } = useContext(AppContext);
 
@@ -91,22 +89,46 @@ function ProductDetail() {
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log(data);
+    if (parseInt(data.categoryId, 10) === 0) {
+      enqueueSnackbar('Please choose category type!', { variant: 'error' });
+      return;
+    }
+
+    if (parseInt(data.supplierId, 10) === 0) {
+      enqueueSnackbar('Please choose supplier!', { variant: 'error' });
+      return;
+    }
+
+    if (parseInt(data.supplierId, 10) === 0) {
+      enqueueSnackbar('Please choose supplier!', { variant: 'error' });
+      return;
+    }
+
+    if (
+      draftToHtml(convertToRaw(shortDescription.getCurrentContent())) === '<p></p>\n'
+    ) {
+      enqueueSnackbar('Please type short description!', { variant: 'error' });
+      return;
+    }
+
+    if (
+      draftToHtml(convertToRaw(detailDescription.getCurrentContent())) ===
+      '<p></p>\n'
+    ) {
+      enqueueSnackbar('Please type detail description!', { variant: 'error' });
+      return;
+    }
+
     const bodyFormData = new FormData();
     Object.keys(data).forEach((key) => {
       if (key === 'image') {
         bodyFormData.append(key, data[key][0]);
+      } else if (key === 'manufacturingDate' || key === 'expiryDate') {
+        bodyFormData.append(key, new Date(data[key]).toISOString());
       } else {
         bodyFormData.append(key, data[key]);
       }
-
-      console.log(key);
-      console.log(data[key]);
     });
-
-    bodyFormData.append('expiryDate', expirationDate.toISOString());
-
-    bodyFormData.append('manufacturingDate', manufactureDate.toISOString());
 
     bodyFormData.append(
       'shortDescription',
@@ -117,15 +139,19 @@ function ProductDetail() {
       draftToHtml(convertToRaw(detailDescription.getCurrentContent()))
     );
 
-    console.log(bodyFormData);
-
-    console.log(parseInt(id, 10));
     if (parseInt(id, 10) === 0) {
-      const res = await axiosInstance.post(`/Products`, bodyFormData, {
-        'Content-Type': 'multipart/form-data'
-      });
+      try {
+        const res = await axiosInstance.post(`/Products`, bodyFormData, {
+          'Content-Type': 'multipart/form-data'
+        });
 
-      console.log(res.data);
+        if (res.status === 200) {
+          enqueueSnackbar('Create product successfullt!', { variant: 'success' });
+          history.push('/products');
+        }
+      } catch (err) {
+        enqueueSnackbar('Product info is invalid!', { variant: 'success' });
+      }
     }
   };
 
@@ -277,7 +303,7 @@ function ProductDetail() {
                     </Typography>
                     <select className={classes.input} {...register('categoryId')}>
                       <option key={0} value={0} selected disabled hidden>
-                        Choose Category Here
+                        Choose category here
                       </option>
                       {store.categoryList.map((category) => {
                         return (
@@ -297,7 +323,7 @@ function ProductDetail() {
                     </Typography>
                     <select className={classes.input} {...register('supplierId')}>
                       <option key={0} value={0} selected disabled hidden>
-                        Choose Company Here
+                        Choose supplier here
                       </option>
                       {store.supplierList.map((supplier) => {
                         return (
@@ -321,8 +347,7 @@ function ProductDetail() {
                       renderInput={(props) => (
                         <TextField className={classes.date} {...props} />
                       )}
-                      value={manufactureDate}
-                      onChange={(newValue) => setManufactureDate(newValue)}
+                      {...register('manufacturingDate')}
                     />
                   </LocalizationProvider>
                   <Typography variant="subtitle1" className={classes.title}>
@@ -333,8 +358,7 @@ function ProductDetail() {
                       renderInput={(props) => (
                         <TextField className={classes.date} {...props} />
                       )}
-                      value={expirationDate}
-                      onChange={(newValue) => setExpirationDate(newValue)}
+                      {...register('expiryDate')}
                     />
                   </LocalizationProvider>
                 </Grid>
@@ -347,7 +371,7 @@ function ProductDetail() {
                     className={classes.input}
                     {...register('image')}
                     onChange={handleProductImageChange}
-                    required={id === 0}
+                    required={parseInt(id, 10) === 0}
                   />
                   <div style={{ textAlign: 'center' }}>
                     <img

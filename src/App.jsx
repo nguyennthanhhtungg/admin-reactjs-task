@@ -8,6 +8,7 @@ import Products from 'pages/Products/Products';
 import { AppContext, defaultValue } from 'contexts/AppContext';
 import ProductDetail from 'pages/Products/ProductDetail';
 import AppReducer from 'reducers/AppReducer';
+import { SnackbarProvider } from 'notistack';
 import axiosInstance from './utils/database';
 
 function App() {
@@ -38,22 +39,30 @@ function App() {
     <Router>
       <ScrollToTop>
         <AppContext.Provider value={{ store, dispatch }}>
-          <Layout>
-            <Switch>
-              <Route exact path="/">
-                <Redirect to="/dashboard" />
-              </Route>
-              <Route exact path="/dashboard">
-                <Dashboard />
-              </Route>
-              <Route exact path="/products">
-                <Products />
-              </Route>
-              <Route exact path="/products/:id">
-                <ProductDetail />
-              </Route>
-            </Switch>
-          </Layout>
+          <SnackbarProvider
+            maxSnack={3}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right'
+            }}
+          >
+            <Layout>
+              <Switch>
+                <Route exact path="/">
+                  <Redirect to="/dashboard" />
+                </Route>
+                <Route exact path="/dashboard">
+                  <Dashboard />
+                </Route>
+                <Route exact path="/products">
+                  <Products />
+                </Route>
+                <Route exact path="/products/:id">
+                  <ProductDetail />
+                </Route>
+              </Switch>
+            </Layout>
+          </SnackbarProvider>
         </AppContext.Provider>
       </ScrollToTop>
     </Router>
