@@ -49,7 +49,10 @@
       "babel-module": {
         "alias": {
           "components": "./src/components",
-          "pages": "./src/pages"
+          "pages": "./src/pages",
+          "contexts": "./src/contexts",
+          "reducers": "./src/reducers",
+          "utils": "./src/utils"
         },
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }

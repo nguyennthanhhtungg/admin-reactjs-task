@@ -32,3 +32,16 @@ code {
   background: #555;
 }
 
+
+/* Hide the HTML5 Number Input’s Arrow Buttons */
+/* Chrome, Safari, Edge, Opera */
+.numberInput::-webkit-outer-spin-button,
+.numberInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.numberInput {
+  -moz-appearance: textfield;
+}
