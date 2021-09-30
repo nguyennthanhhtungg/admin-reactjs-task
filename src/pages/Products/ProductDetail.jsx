@@ -521,7 +521,11 @@ function ProductDetail() {
                     onEditorStateChange={handleDetailDescriptionChange}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid
+                  item
+                  xs={12}
+                  style={{ display: 'flex', justifyContent: 'center' }}
+                >
                   <Button
                     variant="contained"
                     size="large"

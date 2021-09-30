@@ -5,11 +5,15 @@ import ScrollToTop from 'components/ScrollToTop/ScrollToTop';
 import Layout from 'components/Layout/Layout';
 import Dashboard from 'pages/Dashboard/Dashboard';
 import Products from 'pages/Products/Products';
+import Categories from 'pages/Categories/Categories';
 import { AppContext, defaultValue } from 'contexts/AppContext';
 import ProductDetail from 'pages/Products/ProductDetail';
 import AppReducer from 'reducers/AppReducer';
 import { SnackbarProvider } from 'notistack';
-import axiosInstance from './utils/database';
+import Suppliers from 'pages/Suppliers/Suppliers';
+import axiosInstance from 'utils/database';
+import CategoryDetail from 'pages/Categories/CategoryDetail';
+import SupplierDetail from 'pages/Suppliers/SupplierDetail';
 
 function App() {
   const [store, dispatch] = useReducer(AppReducer, defaultValue);
@@ -59,6 +63,18 @@ function App() {
                 </Route>
                 <Route exact path="/products/:id">
                   <ProductDetail />
+                </Route>
+                <Route exact path="/categories">
+                  <Categories />
+                </Route>
+                <Route exact path="/categories/:id">
+                  <CategoryDetail />
+                </Route>
+                <Route exact path="/suppliers">
+                  <Suppliers />
+                </Route>
+                <Route exact path="/suppliers/:id">
+                  <SupplierDetail />
                 </Route>
               </Switch>
             </Layout>
