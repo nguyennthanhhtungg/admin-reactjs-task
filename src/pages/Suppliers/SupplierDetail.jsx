@@ -58,6 +58,17 @@ function SuppplierDetail() {
 
       if (res.status === 200) {
         setSupplier(res.data);
+
+        const blocksFromHtml = htmlToDraft(res.data.description);
+
+        const { contentBlocks, entityMap } = blocksFromHtml;
+
+        const entityMapContentState = ContentState.createFromBlockArray(
+          contentBlocks,
+          entityMap
+        );
+
+        setDescription(EditorState.createWithContent(entityMapContentState));
       }
     }
     if (parseInt(id, 10) !== 0) {
@@ -85,6 +96,11 @@ function SuppplierDetail() {
   const onSubmit = async (data) => {
     console.log(data);
 
+    if (description.getCurrentContent().hasText() === false) {
+      enqueueSnackbar('Please type short description!', { variant: 'error' });
+      return;
+    }
+
     const bodyFormData = new FormData();
 
     bodyFormData.append('supplierId', id);
@@ -96,6 +112,11 @@ function SuppplierDetail() {
         bodyFormData.append(key, data[key]);
       }
     });
+
+    bodyFormData.append(
+      'description',
+      draftToHtml(convertToRaw(description.getCurrentContent()))
+    );
 
     if (parseInt(id, 10) === 0) {
       try {
@@ -207,7 +228,7 @@ function SuppplierDetail() {
                   <input
                     type="file"
                     className={classes.input}
-                    {...register('image')}
+                    {...register('logo')}
                     onChange={handleSupplierLogoChange}
                     required={parseInt(id, 10) === 0}
                   />
@@ -225,7 +246,7 @@ function SuppplierDetail() {
                     )}
                     {supplier && parseInt(id, 10) !== 0 && (
                       <img
-                        src={supplierLogo === null ? supplier.logo : supplierLogo}
+                        src={supplierLogo === null ? supplier.logoUrl : supplierLogo}
                         alt="supplierLogo"
                         style={{ height: 250, width: 250 }}
                       />

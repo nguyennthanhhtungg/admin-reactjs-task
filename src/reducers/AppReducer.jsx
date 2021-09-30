@@ -45,6 +45,36 @@ export default function reducer(state, action) {
         supplierList: action.payload.supplierList
       };
 
+    case 'addNewSupplier':
+      return {
+        ...state,
+        supplierList: [action.payload, ...state.supplierList]
+      };
+
+    case 'updateSupplier':
+      return {
+        ...state,
+        supplierList: state.supplierList.map((supplier) =>
+          supplier.supplierId === action.payload.supplierId
+            ? {
+                ...supplier,
+                supplierName: action.payload.supplierName,
+                location: action.payload.location,
+                logoUrl: action.payload.logoUrl,
+                description: action.payload.description
+              }
+            : supplier
+        )
+      };
+
+    case 'removeSupplier':
+      return {
+        ...state,
+        supplierList: state.supplierList.filter(
+          (supplier) => supplier.supplierId !== action.payload.supplierId
+        )
+      };
+
     default:
       return state;
   }
