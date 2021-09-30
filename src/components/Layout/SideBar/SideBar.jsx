@@ -183,17 +183,25 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
           </ListItemIcon>
           <ListItemText primary="Products" />
         </ListItem>
-        <ListItem button className={classes.listItem}>
+        <ListItem
+          button
+          className={classes.listItem}
+          onClick={() => history.push('/categories')}
+        >
           <ListItemIcon>
             <CategoryOutlinedIcon className={classes.icon} />
           </ListItemIcon>
           <ListItemText primary="Categories" />
         </ListItem>
-        <ListItem button className={classes.listItem}>
+        <ListItem
+          button
+          className={classes.listItem}
+          onClick={() => history.push('/suppliers')}
+        >
           <ListItemIcon>
             <LocationCityOutlinedIcon className={classes.icon} />
           </ListItemIcon>
-          <ListItemText primary="Companies" />
+          <ListItemText primary="Suppliers" />
         </ListItem>
       </List>
       <Divider />
