@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Divider } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import styled from '@mui/material/styles/styled';
@@ -18,51 +18,8 @@ import {
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import { Link } from 'react-router-dom';
 import Helmet from 'react-helmet';
-
-const data = [
-  {
-    name: '01/09/2021',
-    uv: 4000,
-    pv: 2400,
-    amt: 2400
-  },
-  {
-    name: '02/09/2021',
-    uv: 3000,
-    pv: 1398,
-    amt: 2210
-  },
-  {
-    name: '03/09/2021',
-    uv: 2000,
-    pv: 9800,
-    amt: 2290
-  },
-  {
-    name: '04/09/2021',
-    uv: 2780,
-    pv: 3908,
-    amt: 2000
-  },
-  {
-    name: '05/09/2021',
-    uv: 1890,
-    pv: 4800,
-    amt: 2181
-  },
-  {
-    name: '05/09/2021',
-    uv: 2390,
-    pv: 3800,
-    amt: 2500
-  },
-  {
-    name: '07/09/2021',
-    uv: 3490,
-    pv: 4300,
-    amt: 2100
-  }
-];
+import axiosInstance from 'utils/database';
+import numberWithCommas from 'utils/currency';
 
 const Item = styled(Paper)(({ theme, backgroundColor, backgroundImage }) => ({
   ...theme.typography.body2,
@@ -86,8 +43,55 @@ const useStyles = makeStyles(() => ({
 }));
 
 function Dashboard() {
-  const classes = useStyles();
   console.log('Hello Dashboard');
+  const classes = useStyles();
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalCustomers, setTotalCustomers] = useState(0);
+  const [totalEmployees, setTotalEmployees] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [chartData, setChartData] = useState([]);
+
+  useEffect(() => {
+    async function loadInitialData() {
+      const totalProductsRes = await axiosInstance.get(`/Products/TotalProducts`);
+
+      if (totalProductsRes.status === 200) {
+        setTotalProducts(totalProductsRes.data);
+      }
+
+      const totalCustomersRes = await axiosInstance.get(`/Customers/TotalCustomers`);
+
+      if (totalCustomersRes.status === 200) {
+        setTotalCustomers(totalCustomersRes.data);
+      }
+
+      const totalEmployeesRes = await axiosInstance.get(`/Employees/TotalEmployees`);
+
+      if (totalEmployeesRes.status === 200) {
+        setTotalEmployees(totalEmployeesRes.data);
+      }
+
+      const totalRevenueRes = await axiosInstance.get(`/Orders/TotalRevenue`);
+
+      if (totalRevenueRes.status === 200) {
+        setTotalRevenue(totalRevenueRes.data);
+      }
+
+      const today = new Date();
+      const date = new Date();
+      date.setDate(today.getDate() - 6);
+
+      const chartDataRes = await axiosInstance.get(
+        `/Orders/TopProductNumberAndOrderNumberByDate?fromDateTime=${date.toISOString()}&toDateTime=${today.toISOString()}`
+      );
+
+      if (chartDataRes.status === 200) {
+        setChartData(chartDataRes.data);
+      }
+    }
+
+    loadInitialData();
+  }, []);
 
   return (
     <>
@@ -118,7 +122,7 @@ function Dashboard() {
               backgroundImage="linear-gradient(to bottom left, #23189b, #4335cc)"
             >
               <Typography variant="h4" className={classes.value}>
-                9.823
+                {totalProducts}
               </Typography>
               <Typography variant="h6" className={classes.key}>
                 Total Products
@@ -134,7 +138,7 @@ function Dashboard() {
               backgroundImage="linear-gradient(to bottom left, #3186cd, #5ba6ee)"
             >
               <Typography variant="h4" className={classes.value}>
-                9.823
+                {totalCustomers}
               </Typography>
               <Typography variant="h6" className={classes.key}>
                 Total Customers
@@ -150,7 +154,7 @@ function Dashboard() {
               backgroundImage="linear-gradient(to bottom left, #f69912, #fac044)"
             >
               <Typography variant="h4" className={classes.value}>
-                9.823
+                {totalEmployees}
               </Typography>
               <Typography variant="h6" className={classes.key}>
                 Total Employees
@@ -166,7 +170,7 @@ function Dashboard() {
               backgroundImage="linear-gradient(to bottom left, #da4041, #e55252)"
             >
               <Typography variant="h4" className={classes.value}>
-                9.823
+                {numberWithCommas(totalRevenue)}
               </Typography>
               <Typography variant="h6" className={classes.key}>
                 Revenue
@@ -179,19 +183,20 @@ function Dashboard() {
         </Grid>
         <div style={{ marginTop: 30 }}>
           <ResponsiveContainer width="99%" height={400}>
-            <LineChart data={data}>
+            <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
+              <XAxis dataKey="date" padding={{ left: 30, right: 30 }} />
               <YAxis />
               <Tooltip />
               <Legend />
               <Line
                 type="monotone"
-                dataKey="pv"
+                dataKey="product"
+                name="Product"
                 stroke="#8884d8"
                 activeDot={{ r: 8 }}
               />
-              <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+              <Line type="monotone" dataKey="order" name="Order" stroke="#82ca9d" />
             </LineChart>
           </ResponsiveContainer>
         </div>
