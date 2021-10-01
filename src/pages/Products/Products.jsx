@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
@@ -20,6 +20,10 @@ import { useHistory } from 'react-router-dom';
 import axiosInstance from 'utils/database';
 import numberWithCommas from 'utils/currency';
 import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
+import Skeleton from '@mui/material/Skeleton';
+import Box from '@mui/material/Box';
+import { AppContext } from '../../contexts/AppContext';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -46,6 +50,26 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const useStyles = makeStyles(() => ({
   root: {
     margin: 30
+  },
+  select: {
+    padding: 7,
+    fontSize: 'large',
+    fontFamily: 'Roboto',
+    borderRadius: 0,
+    marginRight: 10
+  },
+  searchInput: {
+    padding: 7,
+    fontSize: 'large',
+    fontFamily: 'Roboto',
+    borderRadius: 0,
+    borderWidth: 1,
+    height: '100%',
+    borderStyle: 'solid'
+  },
+  searchBtn: {
+    height: '100%',
+    borderRadius: 0
   }
 }));
 
@@ -55,39 +79,31 @@ function Products() {
   const classes = useStyles();
   const theme = useTheme();
   const history = useHistory();
+  const { store, dispatch } = useContext(AppContext);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [productNumber, setProductNumber] = useState(0);
-  const [productListByPaginationParameters, setProductListByPaginationParameters] =
-    useState([]);
+  const [productListByParameters, setProductListByParameters] = useState([]);
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(-1);
+  const [isLoading, setIsLoading] = useState(true);
+
+  async function loadProductListByParameters(keywords, categoryId) {
+    setIsLoading(true);
+    const productListByParametersRes = await axiosInstance.get(
+      `/Products/ProductListByParameters?keywords=${keywords}&categoryId=${categoryId}`
+    );
+
+    if (productListByParametersRes.status === 200) {
+      setProductListByParameters(productListByParametersRes.data);
+    } else {
+      setProductListByParameters([]);
+    }
+    setIsLoading(false);
+  }
 
   useEffect(() => {
-    async function loadProductNumber() {
-      const productNumberRes = await axiosInstance.get(`/Products/ProductNumber`);
-
-      if (productNumberRes.status === 200) {
-        setProductNumber(productNumberRes.data);
-      }
-    }
-
-    loadProductNumber();
+    loadProductListByParameters(search, selectedCategory);
   }, []);
-
-  useEffect(() => {
-    async function loadProductListByPaginationParameters() {
-      const productListRes = await axiosInstance.get(
-        `/Products/ProductListByPaginationParameters?pageNumber=${
-          page + 1
-        }&pageSize=${rowsPerPage}`
-      );
-
-      if (productListRes.status === 200) {
-        setProductListByPaginationParameters(productListRes.data);
-      }
-    }
-
-    loadProductListByPaginationParameters();
-  }, [page, rowsPerPage]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -98,6 +114,19 @@ function Products() {
     setPage(0);
   };
 
+  const handleCategoryChange = async (e) => {
+    setSearch('');
+    setSelectedCategory(e.target.value);
+    await loadProductListByParameters('', e.target.value);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handleSearchClick = async (e) => {
+    await loadProductListByParameters(search, selectedCategory);
+  };
   return (
     <>
       <Helmet>
@@ -115,15 +144,49 @@ function Products() {
         >
           PRODUCT TABLE
         </Typography>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => history.push('/products/0')}
-          startIcon={<AddIcon />}
-          style={{ fontFamily: 'Roboto', marginBottom: 5 }}
-        >
-          NEW
-        </Button>
+        <div style={{ display: 'flex', marginBottom: 5 }}>
+          {/* eslint-disable-next-line jsx-a11y/no-onchange */}
+          <select
+            className={classes.select}
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+          >
+            <option key={-1} value={-1}>
+              All Category
+            </option>
+            {store.categoryList.map((category) => {
+              return (
+                <option key={category.categoryId} value={category.categoryId}>
+                  {category.categoryName}
+                </option>
+              );
+            })}
+          </select>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <input
+              className={classes.searchInput}
+              value={search}
+              onChange={handleSearchChange}
+              placeholder="Searching..."
+            />
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<SearchIcon />}
+              className={classes.searchBtn}
+              onClick={handleSearchClick}
+            />
+          </div>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => history.push('/products/0')}
+            startIcon={<AddIcon />}
+            style={{ fontFamily: 'Roboto', marginLeft: 'auto' }}
+          >
+            NEW
+          </Button>
+        </div>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 700 }}>
             <TableHead>
@@ -140,66 +203,124 @@ function Products() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {productListByPaginationParameters.map((product, index) => (
-                <StyledTableRow key={product.productId}>
+              {isLoading === true && (
+                <StyledTableRow>
                   <StyledTableCell
                     component="th"
                     scope="row"
                     style={{ fontWeight: 'bolder' }}
                   >
-                    {rowsPerPage * page + index + 1}
+                    <Skeleton />
+                    <Skeleton animation="wave" />
+                    <Skeleton animation={false} />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {product.productCode}
+                    <Skeleton />
+                    <Skeleton animation="wave" />
+                    <Skeleton animation={false} />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    <img
-                      src={product.imageUrl}
-                      alt="productImage"
-                      style={{ width: 50, height: 50 }}
-                    />
+                    <Skeleton />
+                    <Skeleton animation="wave" />
+                    <Skeleton animation={false} />
                   </StyledTableCell>
                   <StyledTableCell align="left">
-                    {product.productName}
+                    <Skeleton />
+                    <Skeleton animation="wave" />
+                    <Skeleton animation={false} />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {product.category.categoryName}
+                    <Skeleton />
+                    <Skeleton animation="wave" />
+                    <Skeleton animation={false} />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {product.supplier.supplierName}
+                    <Skeleton />
+                    <Skeleton animation="wave" />
+                    <Skeleton animation={false} />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {numberWithCommas(product.price)}
+                    <Skeleton />
+                    <Skeleton animation="wave" />
+                    <Skeleton animation={false} />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {product.discount}
+                    <Skeleton />
+                    <Skeleton animation="wave" />
+                    <Skeleton animation={false} />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      color="warning"
-                      style={{ margin: 5 }}
-                      startIcon={<EditIcon fontSize="inherit" />}
-                      onClick={() => history.push(`/products/${product.productId}`)}
-                    >
-                      EDIT
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      type="link"
-                      size="small"
-                      href={`${process.env.REACT_APP_REACTJS_WEBSITE}/product/${product.id}`}
-                      target="_blank"
-                      color="success"
-                      style={{ margin: 5 }}
-                      startIcon={<WebIcon fontSize="inherit" />}
-                    >
-                      VIEW
-                    </Button>
+                    <Skeleton />
+                    <Skeleton animation="wave" />
+                    <Skeleton animation={false} />
                   </StyledTableCell>
                 </StyledTableRow>
-              ))}
+              )}
+              {isLoading === false &&
+                productListByParameters
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((product, index) => (
+                    <StyledTableRow key={product.productId}>
+                      <StyledTableCell
+                        component="th"
+                        scope="row"
+                        style={{ fontWeight: 'bolder' }}
+                      >
+                        {page * rowsPerPage + index + 1}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {product.productCode}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        <img
+                          src={product.imageUrl}
+                          alt="productImage"
+                          style={{ width: 50, height: 50 }}
+                        />
+                      </StyledTableCell>
+                      <StyledTableCell align="left">
+                        {product.productName}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {product.category.categoryName}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {product.supplier.supplierName}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {numberWithCommas(product.price)}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {product.discount}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          color="warning"
+                          style={{ margin: 5 }}
+                          startIcon={<EditIcon fontSize="inherit" />}
+                          onClick={() =>
+                            history.push(`/products/${product.productId}`)
+                          }
+                        >
+                          EDIT
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          type="link"
+                          size="small"
+                          href={`${process.env.REACT_APP_REACTJS_WEBSITE}/product/${product.productId}`}
+                          target="_blank"
+                          color="info"
+                          style={{ margin: 5 }}
+                          startIcon={<WebIcon fontSize="inherit" />}
+                        >
+                          VIEW
+                        </Button>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
             </TableBody>
             <TableFooter>
               <TableRow
@@ -211,8 +332,8 @@ function Products() {
                   style={{
                     color: theme.palette.common.white
                   }}
-                  rowsPerPageOptions={[10, 25, 50]}
-                  count={productNumber}
+                  rowsPerPageOptions={[10, 25, 50, { label: 'All', value: -1 }]}
+                  count={productListByParameters.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   onPageChange={handleChangePage}

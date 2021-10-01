@@ -97,7 +97,7 @@ function SuppplierDetail() {
     console.log(data);
 
     if (description.getCurrentContent().hasText() === false) {
-      enqueueSnackbar('Please type short description!', { variant: 'error' });
+      enqueueSnackbar('Please type description!', { variant: 'error' });
       return;
     }
 
