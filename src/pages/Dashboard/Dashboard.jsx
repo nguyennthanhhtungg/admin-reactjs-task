@@ -82,7 +82,7 @@ function Dashboard() {
       date.setDate(today.getDate() - 6);
 
       const chartDataRes = await axiosInstance.get(
-        `/Orders/TopProductNumberAndOrderNumberByDate?fromDateTime=${date.toISOString()}&toDateTime=${today.toISOString()}`
+        `/Orders/ProductNumberAndOrderNumberByDate?fromDateTime=${date.toISOString()}&toDateTime=${today.toISOString()}`
       );
 
       if (chartDataRes.status === 200) {
