@@ -117,6 +117,8 @@ function Products() {
   const handleCategoryChange = async (e) => {
     setSearch('');
     setSelectedCategory(e.target.value);
+    setPage(0);
+    setRowsPerPage(10);
     await loadProductListByParameters('', e.target.value);
   };
 
@@ -125,6 +127,8 @@ function Products() {
   };
 
   const handleSearchClick = async (e) => {
+    setPage(0);
+    setRowsPerPage(10);
     await loadProductListByParameters(search, selectedCategory);
   };
   return (
