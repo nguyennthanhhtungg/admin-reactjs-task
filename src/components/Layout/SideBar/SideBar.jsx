@@ -230,7 +230,27 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
         </ListItem>
       </List>
       <Divider />
-      <List sx={{ width: '100%', color: 'lightgray' }} disablePadding>
+      <List
+        sx={{ width: '100%', color: 'lightgray' }}
+        subheader={
+          !compact && (
+            <ListSubheader component="div" className={classes.listSubheader}>
+              OTHERS
+            </ListSubheader>
+          )
+        }
+        disablePadding
+      >
+        <ListItem
+          button
+          className={classes.listItem}
+          onClick={() => history.push('/Configurations')}
+        >
+          <ListItemIcon>
+            <AcUnitOutlinedIcon className={classes.icon} />
+          </ListItemIcon>
+          <ListItemText primary="Configurations" />
+        </ListItem>
         <ListItem button className={classes.listItem}>
           <ListItemIcon>
             <SettingsOutlinedIcon className={classes.icon} />
