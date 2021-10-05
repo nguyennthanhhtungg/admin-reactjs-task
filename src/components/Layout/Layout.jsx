@@ -18,7 +18,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 function Layout(props) {
   const { children } = props;
   const [open, setOpen] = React.useState(true);
-  const [compact, setCompact] = useState(false);
+  const [compact, setCompact] = useState(true);
 
   const handleDrawerOpenToggle = () => {
     setOpen(!open);

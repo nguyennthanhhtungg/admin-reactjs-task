@@ -95,7 +95,7 @@ function CategoryDetail() {
         });
 
         if (res.status === 200) {
-          enqueueSnackbar('Create category successfullt!', { variant: 'success' });
+          enqueueSnackbar('Create category successfully!', { variant: 'success' });
 
           dispatch({
             type: 'addNewCategory',

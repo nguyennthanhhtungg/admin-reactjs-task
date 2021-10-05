@@ -14,6 +14,8 @@ import Suppliers from 'pages/Suppliers/Suppliers';
 import axiosInstance from 'utils/database';
 import CategoryDetail from 'pages/Categories/CategoryDetail';
 import SupplierDetail from 'pages/Suppliers/SupplierDetail';
+import Configurations from 'pages/Configurations/Configurations';
+import ConfigurationDetail from 'pages/Configurations/ConfigurationDetail';
 
 function App() {
   const [store, dispatch] = useReducer(AppReducer, defaultValue);
@@ -75,6 +77,12 @@ function App() {
                 </Route>
                 <Route exact path="/suppliers/:id">
                   <SupplierDetail />
+                </Route>
+                <Route exact path="/configurations">
+                  <Configurations />
+                </Route>
+                <Route exact path="/configurations/:key">
+                  <ConfigurationDetail />
                 </Route>
               </Switch>
             </Layout>
