@@ -45,3 +45,13 @@ code {
 .numberInput {
   -moz-appearance: textfield;
 }
+
+.carousel .thumb img {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.carousel .slide img {
+  max-height: 100vh;  /* change this to whatever you want */
+  width: auto;
+}

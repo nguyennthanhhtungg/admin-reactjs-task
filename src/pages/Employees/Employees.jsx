@@ -21,8 +21,8 @@ import axiosInstance from 'utils/database';
 import numberWithCommas from 'utils/currency';
 import AddIcon from '@mui/icons-material/Add';
 import { AppContext } from 'contexts/AppContext';
-import CheckIcon from '@mui/icons-material/Check';
-import CancelIcon from '@mui/icons-material/Cancel';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import LockIcon from '@mui/icons-material/Lock';
 import { StyledTableCell, StyledTableRow } from 'components/StyledTable/StyledTable';
 
 const useStyles = makeStyles(() => ({
@@ -31,18 +31,34 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function Categories() {
-  console.log('Hello Categories');
+function Employees() {
+  console.log('Hello Employees');
 
   const classes = useStyles();
   const theme = useTheme();
   const history = useHistory();
   const { store, dispatch } = useContext(AppContext);
 
+  useEffect(() => {
+    async function loadEmployeeData() {
+      try {
+        const res = await axiosInstance.get(`/Employees`);
+
+        console.log(res);
+      } catch (err) {
+        if (err.response.status === 401) {
+          // history.push('/login');
+        }
+      }
+    }
+
+    loadEmployeeData();
+  }, []);
+
   return (
     <>
       <Helmet>
-        <title>Category Table | React App</title>
+        <title>Employee Table | React App</title>
       </Helmet>
       <div className={classes.root}>
         <Typography
@@ -54,7 +70,7 @@ function Categories() {
             fontFamily: 'Roboto'
           }}
         >
-          CATEGORY TABLE
+          EMPLOYEE TABLE
         </Typography>
         <Button
           variant="contained"
@@ -70,9 +86,13 @@ function Categories() {
             <TableHead>
               <TableRow>
                 <StyledTableCell align="center">#</StyledTableCell>
-                <StyledTableCell align="center">IMAGE</StyledTableCell>
-                <StyledTableCell align="center">CATEGORY NAME</StyledTableCell>
-                <StyledTableCell align="center">ACTIVE</StyledTableCell>
+                <StyledTableCell align="center">NO</StyledTableCell>
+                <StyledTableCell align="center">AVATAR</StyledTableCell>
+                <StyledTableCell align="center">NAME</StyledTableCell>
+                <StyledTableCell align="center">EMAIL</StyledTableCell>
+                <StyledTableCell align="center">PHONE NUMBER</StyledTableCell>
+                <StyledTableCell align="center">STATUS</StyledTableCell>
+                <StyledTableCell align="center">TITLE</StyledTableCell>
                 <StyledTableCell align="center">OPERATION</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -88,6 +108,9 @@ function Categories() {
                     {index + 1}
                   </StyledTableCell>
                   <StyledTableCell align="center">
+                    {category.categoryName}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
                     <img
                       src={category.imageUrl}
                       alt="categoryImage"
@@ -98,11 +121,20 @@ function Categories() {
                     {category.categoryName}
                   </StyledTableCell>
                   <StyledTableCell align="center">
+                    {category.categoryName}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    {category.categoryName}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
                     {category.active === true ? (
-                      <CheckIcon color="success" fontSize="large" />
+                      <LockOpenIcon color="success" fontSize="large" />
                     ) : (
-                      <CancelIcon color="error" fontSize="large" />
+                      <LockIcon color="error" fontSize="large" />
                     )}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    {category.categoryName}
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     <Button
@@ -123,9 +155,13 @@ function Categories() {
             <TableFooter>
               <TableRow>
                 <StyledTableCell align="center">#</StyledTableCell>
-                <StyledTableCell align="center">IMAGE</StyledTableCell>
-                <StyledTableCell align="center">CATEGORY NAME</StyledTableCell>
-                <StyledTableCell align="center">ACTIVE</StyledTableCell>
+                <StyledTableCell align="center">NO</StyledTableCell>
+                <StyledTableCell align="center">AVATAR</StyledTableCell>
+                <StyledTableCell align="center">NAME</StyledTableCell>
+                <StyledTableCell align="center">EMAIL</StyledTableCell>
+                <StyledTableCell align="center">PHONE NUMBER</StyledTableCell>
+                <StyledTableCell align="center">STATUS</StyledTableCell>
+                <StyledTableCell align="center">TITLE</StyledTableCell>
                 <StyledTableCell align="center">OPERATION</StyledTableCell>
               </TableRow>
             </TableFooter>
@@ -136,4 +172,4 @@ function Categories() {
   );
 }
 
-export default Categories;
+export default Employees;

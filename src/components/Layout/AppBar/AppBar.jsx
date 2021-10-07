@@ -11,6 +11,38 @@ import Badge from '@mui/material/Badge';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import Avatar from '@mui/material/Avatar';
+import Popover from '@mui/material/Popover';
+import { Button } from '@mui/material';
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  '& .MuiBadge-badge': {
+    backgroundColor: '#44b700',
+    color: '#44b700',
+    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+    '&::after': {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      borderRadius: '50%',
+      animation: 'ripple 1.2s infinite ease-in-out',
+      border: '1px solid currentColor',
+      content: '""'
+    }
+  },
+  '@keyframes ripple': {
+    '0%': {
+      transform: 'scale(.8)',
+      opacity: 1
+    },
+    '100%': {
+      transform: 'scale(2.4)',
+      opacity: 0
+    }
+  }
+}));
 
 const AppBar = styled(MuiAppBar)(({ theme, open, compact, drawerWidth }) => ({
   zIndex: theme.zIndex.drawer + 1,
@@ -48,11 +80,39 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       color: 'black'
     }
+  },
+  subLink: {
+    textDecoration: 'none',
+    display: 'block',
+    padding: 8,
+    marginLeft: 5,
+    marginRight: 5,
+    '&:hover': {
+      backgroundColor: '#d3e9f3'
+    }
+  },
+  popover: {
+    pointerEvents: 'none'
+  },
+  paper: {
+    pointerEvents: 'auto',
+    padding: 5
   }
 }));
 
 function AppBarProvider({ open, compact, handleDrawerOpenToggle, drawerWidth }) {
   const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handlePopoverOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const popoverOpen = Boolean(anchorEl);
   return (
     <AppBar position="fixed" open={open} compact={compact} drawerWidth={drawerWidth}>
       <Toolbar style={{ display: 'flex' }}>
@@ -92,9 +152,41 @@ function AppBarProvider({ open, compact, handleDrawerOpenToggle, drawerWidth }) 
               />
             </Badge>
           </IconButton>
-          <IconButton size="large" edge="end" color="inherit">
-            <AccountCircleOutlinedIcon fontSize="large" style={{ color: 'black' }} />
-          </IconButton>
+          <div onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}>
+            <IconButton size="large" edge="end" color="inherit">
+              <StyledBadge
+                overlap="circular"
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                variant="dot"
+              >
+                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+              </StyledBadge>
+            </IconButton>
+            <Popover
+              id="mouse-over-popover"
+              className={classes.popover}
+              classes={{
+                paper: classes.paper
+              }}
+              open={popoverOpen}
+              anchorEl={anchorEl}
+              onClose={handlePopoverClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left'
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left'
+              }}
+              disableRestoreFocus
+            >
+              <div>
+                <Button className={classes.subLink}>PROFILE</Button>
+                <Button className={classes.subLink}>LOG OUT</Button>
+              </div>
+            </Popover>
+          </div>
         </Box>
       </Toolbar>
     </AppBar>
