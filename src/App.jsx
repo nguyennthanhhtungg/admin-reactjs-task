@@ -43,7 +43,7 @@ function App() {
         let employee = {};
         if (isRememberMe === 'true') {
           employee = JSON.parse(localStorage.getItem('employee'));
-        } else if (isRememberMe === null || isRememberMe === 'false') {
+        } else if (isRememberMe === 'false') {
           employee = JSON.parse(sessionStorage.getItem('employee'));
         }
 

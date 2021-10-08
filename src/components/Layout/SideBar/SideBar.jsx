@@ -251,11 +251,15 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
           </ListItemIcon>
           <ListItemText primary="Configurations" />
         </ListItem>
-        <ListItem button className={classes.listItem}>
+        <ListItem
+          button
+          className={classes.listItem}
+          onClick={() => history.push('/settings')}
+        >
           <ListItemIcon>
             <SettingsOutlinedIcon className={classes.icon} />
           </ListItemIcon>
-          <ListItemText primary="settings" />
+          <ListItemText primary="Settings" />
         </ListItem>
       </List>
       <Divider />

@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import { styled } from '@mui/material/styles';
 import MuiAppBar from '@mui/material/AppBar';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import Box from '@mui/material/Box';
 import Badge from '@mui/material/Badge';
@@ -14,6 +14,9 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import Avatar from '@mui/material/Avatar';
 import Popover from '@mui/material/Popover';
 import { Button } from '@mui/material';
+import { AppContext } from 'contexts/AppContext';
+import { useSnackbar } from 'notistack';
+import axiosInstance from 'utils/database';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -102,6 +105,9 @@ const useStyles = makeStyles((theme) => ({
 
 function AppBarProvider({ open, compact, handleDrawerOpenToggle, drawerWidth }) {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
+  const history = useHistory();
+  const { store } = useContext(AppContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handlePopoverOpen = (event) => {
@@ -110,6 +116,23 @@ function AppBarProvider({ open, compact, handleDrawerOpenToggle, drawerWidth }) 
 
   const handlePopoverClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogOut = async () => {
+    try {
+      const res = await axiosInstance.get('/Auth/Logout');
+
+      if (res.status === 200) {
+        localStorage.removeItem('isRememberMe');
+        localStorage.removeItem('employee');
+        sessionStorage.removeItem('employee');
+
+        enqueueSnackbar('You have just logged out!', { variant: 'success' });
+        history.push('/login');
+      }
+    } catch (err) {
+      enqueueSnackbar(err.response.data.Message, { variant: 'error' });
+    }
   };
 
   const popoverOpen = Boolean(anchorEl);
@@ -130,9 +153,6 @@ function AppBarProvider({ open, compact, handleDrawerOpenToggle, drawerWidth }) 
         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
           <Link to="/dashboard" className={classes.link}>
             Dashboard
-          </Link>
-          <Link to="/users" className={classes.link}>
-            Users
           </Link>
           <Link to="/settings" className={classes.link}>
             Settings
@@ -159,7 +179,14 @@ function AppBarProvider({ open, compact, handleDrawerOpenToggle, drawerWidth }) 
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 variant="dot"
               >
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                <Avatar
+                  alt="avatar"
+                  src={
+                    store.employee
+                      ? store.employee.avatarUrl
+                      : '/static/images/avatar/1.jpg'
+                  }
+                />
               </StyledBadge>
             </IconButton>
             <Popover
@@ -183,7 +210,9 @@ function AppBarProvider({ open, compact, handleDrawerOpenToggle, drawerWidth }) 
             >
               <div>
                 <Button className={classes.subLink}>PROFILE</Button>
-                <Button className={classes.subLink}>LOG OUT</Button>
+                <Button className={classes.subLink} onClick={handleLogOut}>
+                  LOG OUT
+                </Button>
               </div>
             </Popover>
           </div>

@@ -14,8 +14,11 @@ import Typography from '@mui/material/Typography';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { Carousel } from 'react-responsive-carousel';
 import { useSnackbar } from 'notistack';
-import { get } from 'react-hook-form';
-import axiosInstance from '../../utils/database';
+import Helmet from 'react-helmet';
+import { useHistory } from 'react-router-dom';
+import axiosInstance from 'utils/database';
+import { useContext } from 'react';
+import { AppContext } from '../../contexts/AppContext';
 
 function Copyright(props) {
   return (
@@ -84,11 +87,13 @@ const carouselData = [
 
 function LogIn() {
   console.log('Hello LogIn');
+
+  const history = useHistory();
+  const { dispatch } = useContext(AppContext);
   const { enqueueSnackbar } = useSnackbar();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     try {
       const data = new FormData(event.currentTarget);
 
@@ -97,96 +102,118 @@ function LogIn() {
         password: data.get('password'),
         role: 'Employee'
       });
-      console.log(res);
+
+      if (data.get('isRememberMe') !== null) {
+        localStorage.setItem('isRememberMe', true);
+        localStorage.setItem('employee', JSON.stringify(res.data));
+      } else {
+        localStorage.setItem('isRememberMe', false);
+        sessionStorage.setItem('employee', JSON.stringify(res.data));
+      }
+
+      dispatch({
+        type: 'updateEmployee',
+        payload: {
+          employee: res.data
+        }
+      });
+
+      history.push('/');
     } catch (err) {
       enqueueSnackbar(err.response.data.Message, { variant: 'error' });
     }
   };
 
   return (
-    <Grid container component="main" sx={{ height: '100vh' }}>
-      <CssBaseline />
-      <Grid
-        item
-        xs={false}
-        sm={4}
-        md={7}
-        sx={{ display: { xs: 'none', md: 'block' } }}
-      >
-        <Carousel
-          showArrows={false}
-          showThumbs={false}
-          showStatus={false}
-          autoPlay
-          infiniteLoop
+    <>
+      <Helmet>
+        <title>Log In | React App</title>
+      </Helmet>
+      <Grid container component="main" sx={{ height: '100vh' }}>
+        <CssBaseline />
+        <Grid
+          item
+          xs={false}
+          sm={4}
+          md={7}
+          sx={{ display: { xs: 'none', md: 'block' } }}
         >
-          {carouselData.map((carousel) => (
-            <div key={carousel.carouselId}>
-              <img
-                src={carousel.carouselImageUrl}
-                alt="carouselImageUrl"
-                style={{ height: '100vh' }}
+          <Carousel
+            showArrows={false}
+            showThumbs={false}
+            showStatus={false}
+            autoPlay
+            infiniteLoop
+          >
+            {carouselData.map((carousel) => (
+              <div key={carousel.carouselId}>
+                <img
+                  src={carousel.carouselImageUrl}
+                  alt="carouselImageUrl"
+                  style={{ height: '100vh' }}
+                />
+              </div>
+            ))}
+          </Carousel>
+        </Grid>
+        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+          <Box
+            sx={{
+              my: 8,
+              mx: 4,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}
+          >
+            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              Sign in
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                type="email"
+                name="email"
+                autoComplete="email"
+                autoFocus
               />
-            </div>
-          ))}
-        </Carousel>
-      </Grid>
-      <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-        <Box
-          sx={{
-            my: 8,
-            mx: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center'
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              id="remember"
-              name="remember"
-              label="Remember me"
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button>
-            <Copyright sx={{ mt: 5 }} />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+              />
+              <FormControlLabel
+                control={<Checkbox value="isRememberMe" color="primary" />}
+                id="isRememberMe"
+                name="isRememberMe"
+                label="Remember me"
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Sign In
+              </Button>
+              <Copyright sx={{ mt: 5 }} />
+            </Box>
           </Box>
-        </Box>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 }
 
