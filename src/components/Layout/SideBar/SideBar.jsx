@@ -112,14 +112,6 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
   const classes = useStyles();
   const history = useHistory();
 
-  const handleRedirectToDashboardPage = () => {
-    history.push('/dashboard');
-  };
-
-  const handleRedirectToProductsPage = () => {
-    history.push('/products');
-  };
-
   return (
     <Drawer
       variant="persistent"
@@ -135,7 +127,7 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
             fontWeight: 'bolder',
             fontFamily: 'Roboto'
           }}
-          onClick={handleRedirectToDashboardPage}
+          onClick={() => history.push('/dashboard')}
         >
           ADMIN REACT.JS
         </Typography>
@@ -153,7 +145,7 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
         <ListItem
           button
           className={classes.listItem}
-          onClick={handleRedirectToDashboardPage}
+          onClick={() => history.push('/dashboard')}
         >
           <ListItemIcon>
             <DashboardIcon className={classes.icon} />
@@ -176,7 +168,7 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
         <ListItem
           button
           className={classes.listItem}
-          onClick={handleRedirectToProductsPage}
+          onClick={() => history.push('/products')}
         >
           <ListItemIcon>
             <AcUnitOutlinedIcon className={classes.icon} />
@@ -216,13 +208,21 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
         }
         disablePadding
       >
-        <ListItem button className={classes.listItem}>
+        <ListItem
+          button
+          className={classes.listItem}
+          onClick={() => history.push('/customers')}
+        >
           <ListItemIcon>
             <PeopleOutlinedIcon className={classes.icon} />
           </ListItemIcon>
           <ListItemText primary="Customers" />
         </ListItem>
-        <ListItem button className={classes.listItem}>
+        <ListItem
+          button
+          className={classes.listItem}
+          onClick={() => history.push('/employees')}
+        >
           <ListItemIcon>
             <PeopleAltOutlinedIcon className={classes.icon} />
           </ListItemIcon>
@@ -244,14 +244,18 @@ function SideBar({ open, compact, handleDrawerCompactToggle, drawerWidth }) {
         <ListItem
           button
           className={classes.listItem}
-          onClick={() => history.push('/Configurations')}
+          onClick={() => history.push('/configurations')}
         >
           <ListItemIcon>
             <AcUnitOutlinedIcon className={classes.icon} />
           </ListItemIcon>
           <ListItemText primary="Configurations" />
         </ListItem>
-        <ListItem button className={classes.listItem}>
+        <ListItem
+          button
+          className={classes.listItem}
+          onClick={() => history.push('/settings')}
+        >
           <ListItemIcon>
             <SettingsOutlinedIcon className={classes.icon} />
           </ListItemIcon>

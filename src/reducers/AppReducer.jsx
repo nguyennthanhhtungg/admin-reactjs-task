@@ -75,6 +75,12 @@ export default function reducer(state, action) {
         )
       };
 
+    case 'updateEmployee':
+      return {
+        ...state,
+        employee: action.payload.employee
+      };
+
     default:
       return state;
   }

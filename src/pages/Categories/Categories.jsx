@@ -23,34 +23,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { AppContext } from 'contexts/AppContext';
 import CheckIcon from '@mui/icons-material/Check';
 import CancelIcon from '@mui/icons-material/Cancel';
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.dark,
-    color: theme.palette.common.white,
-    fontWeight: 'bolder',
-    fontFamily: 'Roboto'
-  },
-  [`&.${tableCellClasses.footer}`]: {
-    backgroundColor: theme.palette.primary.dark,
-    color: theme.palette.common.white,
-    fontWeight: 'bolder',
-    fontFamily: 'Roboto'
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14
-  }
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  // hide last border
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}));
+import { StyledTableCell, StyledTableRow } from 'components/StyledTable/StyledTable';
 
 const useStyles = makeStyles(() => ({
   root: {
