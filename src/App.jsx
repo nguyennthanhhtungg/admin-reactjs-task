@@ -25,7 +25,8 @@ import ConfigurationDetail from 'pages/Configurations/ConfigurationDetail';
 import LogIn from 'pages/LogIn/LogIn';
 import Employees from 'pages/Employees/Employees';
 import NotFound from 'pages/NotFound/NotFound';
-import InternalServerError from './pages/ InternalServerError/ InternalServerError';
+import Customers from 'pages/Customers/Customers';
+import InternalServerError from 'pages/ InternalServerError/ InternalServerError';
 
 function App() {
   console.log('Hello App');
@@ -103,6 +104,9 @@ function App() {
               </PrivateRoute>
               <PrivateRoute exact path="/suppliers/:id">
                 <SupplierDetail />
+              </PrivateRoute>
+              <PrivateRoute exact path="/customers">
+                <Customers />
               </PrivateRoute>
               <PrivateRoute exact path="/employees">
                 <Employees />
