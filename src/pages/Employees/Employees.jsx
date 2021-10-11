@@ -103,16 +103,16 @@ const EmployeeBodyTableRow = React.memo(({ employee, index, dispatch }) => {
       </StyledTableCell>
       <StyledTableCell align="center">{employee.title}</StyledTableCell>
       <StyledTableCell align="center">
-        <Button
-          variant="outlined"
-          size="small"
-          color="info"
-          style={{ margin: 5 }}
-          startIcon={<WebIcon fontSize="inherit" />}
-          onClick={handleViewEmployeeDetail}
-        >
-          VIEW
-        </Button>
+        {/* <Button */}
+        {/*  variant="outlined" */}
+        {/*  size="small" */}
+        {/*  color="info" */}
+        {/*  style={{ margin: 5 }} */}
+        {/*  startIcon={<WebIcon fontSize="inherit" />} */}
+        {/*  onClick={handleViewEmployeeDetail} */}
+        {/* > */}
+        {/*  VIEW */}
+        {/* </Button> */}
         {employee.isLocked === false ? (
           <Button
             variant="outlined"
@@ -196,15 +196,15 @@ function Employees() {
           >
             EMPLOYEE TABLE
           </Typography>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={() => history.push('/employees/0')}
-            startIcon={<AddIcon />}
-            style={{ fontFamily: 'Roboto', marginBottom: 5 }}
-          >
-            NEW
-          </Button>
+          {/* <Button */}
+          {/*  variant="contained" */}
+          {/*  color="success" */}
+          {/*  onClick={() => history.push('/employees/0')} */}
+          {/*  startIcon={<AddIcon />} */}
+          {/*  style={{ fontFamily: 'Roboto', marginBottom: 5 }} */}
+          {/* > */}
+          {/*  NEW */}
+          {/* </Button> */}
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 700 }}>
               <TableHead>

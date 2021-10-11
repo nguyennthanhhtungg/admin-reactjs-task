@@ -101,16 +101,16 @@ const CustomerBodyTableRow = React.memo(({ customer, index, dispatch }) => {
         )}
       </StyledTableCell>
       <StyledTableCell align="center">
-        <Button
-          variant="outlined"
-          size="small"
-          color="info"
-          style={{ margin: 5 }}
-          startIcon={<WebIcon fontSize="inherit" />}
-          onClick={handleViewCustomerDetail}
-        >
-          VIEW
-        </Button>
+        {/* <Button */}
+        {/*  variant="outlined" */}
+        {/*  size="small" */}
+        {/*  color="info" */}
+        {/*  style={{ margin: 5 }} */}
+        {/*  startIcon={<WebIcon fontSize="inherit" />} */}
+        {/*  onClick={handleViewCustomerDetail} */}
+        {/* > */}
+        {/*  VIEW */}
+        {/* </Button> */}
         {customer.isLocked === false ? (
           <Button
             variant="outlined"
