@@ -19,6 +19,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import { StyledTableCell, StyledTableRow } from 'components/StyledTable/StyledTable';
 import { EMPLOYEE_ACTION_TYPE } from 'utils/constants';
 import { useSnackbar } from 'notistack';
+import UserInfo from 'components/UserInfo/UserInfo';
 import EmployeeContext, { defaultValue } from './EmployeeContext';
 import EmployeeReducer from './EmployeeReducer';
 
@@ -156,6 +157,7 @@ function Employees() {
   const theme = useTheme();
   const history = useHistory();
   const [store, dispatch] = useReducer(EmployeeReducer, defaultValue);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     async function loadEmployeeData() {
@@ -169,14 +171,23 @@ function Employees() {
           }
         });
       } catch (err) {
-        if (err.response.status === 401) {
-          history.push('/login');
-        }
+        // if (err.response.status === 401) {
+        //   history.push('/login');
+        // }
+        console.log('API Service turned off!');
       }
     }
 
     loadEmployeeData();
   }, []);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <>
@@ -196,15 +207,16 @@ function Employees() {
           >
             EMPLOYEE TABLE
           </Typography>
-          {/* <Button */}
-          {/*  variant="contained" */}
-          {/*  color="success" */}
-          {/*  onClick={() => history.push('/employees/0')} */}
-          {/*  startIcon={<AddIcon />} */}
-          {/*  style={{ fontFamily: 'Roboto', marginBottom: 5 }} */}
-          {/* > */}
-          {/*  NEW */}
-          {/* </Button> */}
+          <Button
+            variant="contained"
+            color="success"
+            // onClick={() => history.push('/employees/0')}
+            onClick={handleOpen}
+            startIcon={<AddIcon />}
+            style={{ fontFamily: 'Roboto', marginBottom: 5 }}
+          >
+            NEW
+          </Button>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 700 }}>
               <TableHead>
@@ -246,6 +258,7 @@ function Employees() {
             </Table>
           </TableContainer>
         </div>
+        <UserInfo open={open} handleClose={handleClose} />
       </EmployeeContext.Provider>
     </>
   );

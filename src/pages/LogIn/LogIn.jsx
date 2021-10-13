@@ -5,7 +5,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -15,10 +14,10 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { Carousel } from 'react-responsive-carousel';
 import { useSnackbar } from 'notistack';
 import Helmet from 'react-helmet';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import axiosInstance from 'utils/database';
 import { useContext } from 'react';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext } from 'contexts/AppContext';
 
 function Copyright(props) {
   return (
@@ -208,6 +207,15 @@ function LogIn() {
               >
                 Sign In
               </Button>
+              <Grid item xs>
+                <Link
+                  to="/password/passwordReset"
+                  variant="body2"
+                  style={{ textDecoration: 'none' }}
+                >
+                  Forgot password?
+                </Link>
+              </Grid>
               <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>

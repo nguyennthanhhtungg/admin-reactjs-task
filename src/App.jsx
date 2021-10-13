@@ -27,6 +27,10 @@ import Employees from 'pages/Employees/Employees';
 import NotFound from 'pages/NotFound/NotFound';
 import Customers from 'pages/Customers/Customers';
 import InternalServerError from 'pages/ InternalServerError/ InternalServerError';
+import Profile from './pages/Profile/Profile';
+import PasswordReset from './pages/Password/PasswordReset';
+import ChangePassword from './pages/Password/ChangePassword';
+import CreateEmployee from './pages/Employees/CreateEmployee';
 
 function App() {
   console.log('Hello App');
@@ -57,9 +61,11 @@ function App() {
           }
         });
       } catch (err) {
-        if (err.response.status === 401) {
-          history.push('/login');
-        }
+        // if (err.response.status === 401) {
+        //   history.push('/login');
+        // }
+
+        console.log('API Service turned off!');
       }
     }
     loadInitialData();
@@ -80,12 +86,20 @@ function App() {
               <Route exact path="/login">
                 <LogIn />
               </Route>
-
+              <Route exact path="/password/passwordReset">
+                <PasswordReset />
+              </Route>
+              <Route exact path="/password/changePassword">
+                <ChangePassword />
+              </Route>
               <PrivateRoute exact path="/">
                 <Redirect to="/dashboard" />
               </PrivateRoute>
               <PrivateRoute exact path="/dashboard">
                 <Dashboard />
+              </PrivateRoute>
+              <PrivateRoute exact path="/profile">
+                <Profile />
               </PrivateRoute>
               <PrivateRoute exact path="/products">
                 <Products />
@@ -111,6 +125,9 @@ function App() {
               <PrivateRoute exact path="/employees">
                 <Employees />
               </PrivateRoute>
+              <PrivateRoute exact path="/employees/createEmployee">
+                <CreateEmployee />
+              </PrivateRoute>
               <PrivateRoute exact path="/configurations">
                 <Configurations />
               </PrivateRoute>
@@ -120,7 +137,6 @@ function App() {
               <Route
                 exact
                 path="/InternalServerError"
-                x
                 component={InternalServerError}
               />
               <Route component={NotFound} />
