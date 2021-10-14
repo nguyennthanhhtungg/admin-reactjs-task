@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Helmet from 'react-helmet';
 import { Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -18,6 +18,9 @@ import Radio from '@mui/material/Radio';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import { Link } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
+import { AppContext } from '../../contexts/AppContext';
+import axiosInstance from '../../utils/database';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -34,7 +37,18 @@ const useStyles = makeStyles(() => ({
 function Profile() {
   console.log('Hello Profile!');
   const classes = useStyles();
-  const [dateOfBirth, setDateOfBirth] = useState(new Date());
+  const { enqueueSnackbar } = useSnackbar();
+  const { store, dispatch } = useContext(AppContext);
+  const [avatar, setAvatar] = useState(null);
+  const [dateOfBirth, setDateOfBirth] = useState(
+    new Date(store.employee.dateOfBirth)
+  );
+
+  const handleAvatarChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      setAvatar(URL.createObjectURL(event.target.files[0]));
+    }
+  };
 
   const {
     register,
@@ -42,8 +56,48 @@ function Profile() {
     watch,
     formState: { errors }
   } = useForm();
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    const bodyFormData = new FormData();
+
+    bodyFormData.append('employeeId', store.employee.employeeId);
+    bodyFormData.append('employeeNo', store.employee.employeeNo);
+    bodyFormData.append('title', store.employee.title);
+    bodyFormData.append('email', store.employee.email);
+    bodyFormData.append('dateOfBirth', dateOfBirth.toISOString());
+
+    Object.keys(data).forEach((key) => {
+      if (key === 'avatar') {
+        bodyFormData.append(key, data[key][0]);
+      } else {
+        bodyFormData.append(key, data[key]);
+      }
+    });
+
+    try {
+      const res = await axiosInstance.put(`/Employees`, bodyFormData, {
+        'Content-Type': 'multipart/form-data'
+      });
+
+      if (res.status === 200) {
+        enqueueSnackbar('Update profile successfully!', { variant: 'success' });
+
+        const isRememberMe = localStorage.getItem('isRememberMe');
+        if (isRememberMe === 'true') {
+          localStorage.setItem('employee', JSON.stringify(res.data));
+        } else if (isRememberMe === 'false') {
+          sessionStorage.setItem('employee', JSON.stringify(res.data));
+        }
+
+        dispatch({
+          type: 'updateEmployee',
+          payload: {
+            employee: res.data
+          }
+        });
+      }
+    } catch (err) {
+      enqueueSnackbar(err.response.data.Message, { variant: 'error' });
+    }
   };
 
   const {
@@ -80,7 +134,7 @@ function Profile() {
               item
               container
               xs={12}
-              sx={{ my: 2 }}
+              sx={{ my: 2, backgroundColor: '#ffffe0' }}
               component={Paper}
               elevation={6}
               square
@@ -111,11 +165,20 @@ function Profile() {
                     margin="normal"
                     required
                     fullWidth
+                    id="employeeNo"
+                    label="Employee No"
+                    name="employeeNo"
+                    defaultValue={store.employee.employeeNo}
+                    disabled
+                  />
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
                     id="title"
                     label="Title"
                     name="title"
-                    defaultValue="Director"
-                    {...register('title')}
+                    defaultValue={store.employee.title}
                     disabled
                   />
                   <TextField
@@ -125,6 +188,7 @@ function Profile() {
                     id="employeeName"
                     label="Employee Name"
                     name="employeeName"
+                    defaultValue={store.employee.employeeName}
                     {...register('employeeName')}
                   />
                   <TextField
@@ -135,6 +199,7 @@ function Profile() {
                     label="Phone Number"
                     type="number"
                     id="phoneNumber"
+                    defaultValue={parseInt(store.employee.phoneNumber, 10)}
                     {...register('phoneNumber')}
                   />
                   <TextField
@@ -145,24 +210,32 @@ function Profile() {
                     label="Email"
                     type="email"
                     name="email"
-                    {...register('email')}
+                    defaultValue={store.employee.email}
                     disabled
                   />
                   <FormControl required component="fieldset">
                     <FormLabel component="legend">Gender</FormLabel>
-                    <RadioGroup name="gender" defaultValue="female" row>
+                    <RadioGroup
+                      name="gender"
+                      defaultValue={
+                        store.employee.gender
+                          ? store.employee.gender.split(' ').join('')
+                          : 'Gender'
+                      }
+                      row
+                    >
                       <FormControlLabel
-                        value="female"
+                        value="Female"
                         control={<Radio color="primary" {...register('gender')} />}
                         label="Female"
                       />
                       <FormControlLabel
-                        value="male"
+                        value="Male"
                         control={<Radio color="primary" {...register('gender')} />}
                         label="Male"
                       />
                       <FormControlLabel
-                        value="other"
+                        value="Other"
                         control={<Radio color="primary" {...register('gender')} />}
                         label="Other"
                       />
@@ -172,9 +245,20 @@ function Profile() {
                     margin="normal"
                     required
                     fullWidth
+                    id="marriageStatus"
+                    label="Marriage Status"
+                    name="marriageStatus"
+                    defaultValue={store.employee.marriageStatus}
+                    {...register('marriageStatus')}
+                  />
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
                     id="address"
                     label="Address"
                     name="address"
+                    defaultValue={store.employee.address}
                     {...register('address')}
                   />
                   <FormControl component="fieldset">
@@ -208,15 +292,14 @@ function Profile() {
               >
                 <div>
                   <img
-                    src="https://via.placeholder.com/250"
+                    src={avatar === null ? store.employee.avatarUrl : avatar}
                     alt="avatar"
                     className={classes.avatar}
                   />
                   <input
                     type="file"
                     {...register('avatar')}
-                    required
-                    style={{ display: 'block' }}
+                    onChange={handleAvatarChange}
                   />
                 </div>
               </Grid>
@@ -228,7 +311,7 @@ function Profile() {
               item
               container
               xs={12}
-              sx={{ my: 2 }}
+              sx={{ my: 2, backgroundColor: '#ffffe0' }}
               component={Paper}
               elevation={6}
               square

@@ -61,11 +61,9 @@ function App() {
           }
         });
       } catch (err) {
-        // if (err.response.status === 401) {
-        //   history.push('/login');
-        // }
-
-        console.log('API Service turned off!');
+        if (err.response.status === 401) {
+          history.push('/login');
+        }
       }
     }
     loadInitialData();
