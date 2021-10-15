@@ -19,6 +19,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import { StyledTableCell, StyledTableRow } from 'components/StyledTable/StyledTable';
 import { EMPLOYEE_ACTION_TYPE } from 'utils/constants';
 import { useSnackbar } from 'notistack';
+import EmployeeInfoDialog from 'components/EmployeeInfoDialog/EmployeeInfoDialog';
 import EmployeeContext, { defaultValue } from './EmployeeContext';
 import EmployeeReducer from './EmployeeReducer';
 
@@ -26,9 +27,14 @@ const EmployeeBodyTableRow = React.memo(({ employee, index, dispatch }) => {
   console.log('Hello EmployeeBodyTableRow');
 
   const { enqueueSnackbar } = useSnackbar();
+  const [open, setOpen] = useState(false);
 
-  const handleViewEmployeeDetail = () => {
-    console.log('View Employee Detail!');
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const handleLockEmployee = async () => {
@@ -74,70 +80,77 @@ const EmployeeBodyTableRow = React.memo(({ employee, index, dispatch }) => {
   };
 
   return (
-    <StyledTableRow>
-      <StyledTableCell
-        component="th"
-        scope="row"
-        style={{ fontWeight: 'bolder' }}
-        align="center"
-      >
-        {index + 1}
-      </StyledTableCell>
-      <StyledTableCell align="center">{employee.employeeNo}</StyledTableCell>
-      <StyledTableCell align="center">
-        <img
-          src={employee.avatarUrl}
-          alt="employeeImage"
-          style={{ width: 50, height: 50 }}
-        />
-      </StyledTableCell>
-      <StyledTableCell align="center">{employee.employeeName}</StyledTableCell>
-      <StyledTableCell align="center">{employee.email}</StyledTableCell>
-      <StyledTableCell align="center">{employee.phoneNumber}</StyledTableCell>
-      <StyledTableCell align="center">
-        {employee.isLocked === false ? (
-          <LockOpenIcon color="success" fontSize="large" />
-        ) : (
-          <LockIcon color="error" fontSize="large" />
-        )}
-      </StyledTableCell>
-      <StyledTableCell align="center">{employee.title}</StyledTableCell>
-      <StyledTableCell align="center">
-        {/* <Button */}
-        {/*  variant="outlined" */}
-        {/*  size="small" */}
-        {/*  color="info" */}
-        {/*  style={{ margin: 5 }} */}
-        {/*  startIcon={<WebIcon fontSize="inherit" />} */}
-        {/*  onClick={handleViewEmployeeDetail} */}
-        {/* > */}
-        {/*  VIEW */}
-        {/* </Button> */}
-        {employee.isLocked === false ? (
+    <>
+      <StyledTableRow>
+        <StyledTableCell
+          component="th"
+          scope="row"
+          style={{ fontWeight: 'bolder' }}
+          align="center"
+        >
+          {index + 1}
+        </StyledTableCell>
+        <StyledTableCell align="center">{employee.employeeNo}</StyledTableCell>
+        <StyledTableCell align="center">
+          <img
+            src={employee.avatarUrl}
+            alt="employeeImage"
+            style={{ width: 50, height: 50 }}
+          />
+        </StyledTableCell>
+        <StyledTableCell align="center">{employee.employeeName}</StyledTableCell>
+        <StyledTableCell align="center">{employee.email}</StyledTableCell>
+        <StyledTableCell align="center">{employee.phoneNumber}</StyledTableCell>
+        <StyledTableCell align="center">
+          {employee.isLocked === false ? (
+            <LockOpenIcon color="success" fontSize="large" />
+          ) : (
+            <LockIcon color="error" fontSize="large" />
+          )}
+        </StyledTableCell>
+        <StyledTableCell align="center">{employee.title}</StyledTableCell>
+        <StyledTableCell align="center">
           <Button
             variant="outlined"
             size="small"
-            color="warning"
+            color="info"
             style={{ margin: 5 }}
-            startIcon={<LockIcon fontSize="inherit" />}
-            onClick={handleLockEmployee}
+            startIcon={<WebIcon fontSize="inherit" />}
+            onClick={handleOpen}
           >
-            LOCK
+            VIEW
           </Button>
-        ) : (
-          <Button
-            variant="outlined"
-            size="small"
-            color="success"
-            style={{ margin: 5 }}
-            startIcon={<LockOpenIcon fontSize="inherit" />}
-            onClick={handleUnlockEmployee}
-          >
-            UNLOCK
-          </Button>
-        )}
-      </StyledTableCell>
-    </StyledTableRow>
+          {employee.isLocked === false ? (
+            <Button
+              variant="outlined"
+              size="small"
+              color="warning"
+              style={{ margin: 5 }}
+              startIcon={<LockIcon fontSize="inherit" />}
+              onClick={handleLockEmployee}
+            >
+              LOCK
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              size="small"
+              color="success"
+              style={{ margin: 5 }}
+              startIcon={<LockOpenIcon fontSize="inherit" />}
+              onClick={handleUnlockEmployee}
+            >
+              UNLOCK
+            </Button>
+          )}
+        </StyledTableCell>
+      </StyledTableRow>
+      <EmployeeInfoDialog
+        employee={employee}
+        open={open}
+        handleClose={handleClose}
+      />
+    </>
   );
 });
 
@@ -156,6 +169,7 @@ function Employees() {
   const theme = useTheme();
   const history = useHistory();
   const [store, dispatch] = useReducer(EmployeeReducer, defaultValue);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     async function loadEmployeeData() {
@@ -196,15 +210,15 @@ function Employees() {
           >
             EMPLOYEE TABLE
           </Typography>
-          {/* <Button */}
-          {/*  variant="contained" */}
-          {/*  color="success" */}
-          {/*  onClick={() => history.push('/employees/0')} */}
-          {/*  startIcon={<AddIcon />} */}
-          {/*  style={{ fontFamily: 'Roboto', marginBottom: 5 }} */}
-          {/* > */}
-          {/*  NEW */}
-          {/* </Button> */}
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => history.push('/employees/createEmployee')}
+            startIcon={<AddIcon />}
+            style={{ fontFamily: 'Roboto', marginBottom: 5 }}
+          >
+            NEW
+          </Button>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 700 }}>
               <TableHead>

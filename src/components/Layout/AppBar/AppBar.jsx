@@ -209,7 +209,12 @@ function AppBarProvider({ open, compact, handleDrawerOpenToggle, drawerWidth }) 
               disableRestoreFocus
             >
               <div>
-                <Button className={classes.subLink}>PROFILE</Button>
+                <Button
+                  className={classes.subLink}
+                  onClick={() => history.push('/profile')}
+                >
+                  PROFILE
+                </Button>
                 <Button className={classes.subLink} onClick={handleLogOut}>
                   LOG OUT
                 </Button>

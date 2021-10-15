@@ -194,7 +194,7 @@ function ProductDetail() {
         });
 
         if (res.status === 200) {
-          enqueueSnackbar('Create product successfullt!', { variant: 'success' });
+          enqueueSnackbar('Create product successfully!', { variant: 'success' });
           history.push('/products');
         }
       } catch (err) {
@@ -207,7 +207,7 @@ function ProductDetail() {
         });
 
         if (res.status === 200) {
-          enqueueSnackbar('Update product successfullt!', { variant: 'success' });
+          enqueueSnackbar('Update product successfully!', { variant: 'success' });
           history.push('/products');
         }
       } catch (err) {
