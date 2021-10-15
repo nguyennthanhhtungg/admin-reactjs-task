@@ -20,6 +20,7 @@ import Radio from '@mui/material/Radio';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import DatePicker from '@mui/lab/DatePicker';
+import axiosInstance from '../../utils/database';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -37,9 +38,16 @@ function CreateEmployee() {
 
   const classes = useStyles();
   const history = useHistory();
-  const [dateOfBirth, setDateOfBirth] = useState(new Date());
   const { enqueueSnackbar } = useSnackbar();
   const { store, dispatch } = useContext(AppContext);
+  const [dateOfBirth, setDateOfBirth] = useState(new Date());
+  const [avatar, setAvatar] = useState(null);
+
+  const handleAvatarChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      setAvatar(URL.createObjectURL(event.target.files[0]));
+    }
+  };
 
   const {
     register,
@@ -49,7 +57,31 @@ function CreateEmployee() {
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log(data);
+    const bodyFormData = new FormData();
+
+    bodyFormData.append('dateOfBirth', dateOfBirth.toISOString());
+
+    Object.keys(data).forEach((key) => {
+      if (key === 'avatar') {
+        bodyFormData.append(key, data[key][0]);
+      } else {
+        bodyFormData.append(key, data[key]);
+      }
+    });
+
+    try {
+      const res = await axiosInstance.post(`/Employees`, bodyFormData, {
+        'Content-Type': 'multipart/form-data'
+      });
+
+      if (res.status === 200) {
+        enqueueSnackbar('Create profile successfully!', { variant: 'success' });
+
+        history.push('/employees');
+      }
+    } catch (err) {
+      enqueueSnackbar(err.response.data.Message, { variant: 'error' });
+    }
   };
 
   return (
@@ -77,12 +109,19 @@ function CreateEmployee() {
                 <div>
                   <div style={{ textAlign: 'center' }}>
                     <img
-                      src="https://via.placeholder.com/250"
+                      src={
+                        avatar === null ? 'https://via.placeholder.com/250' : avatar
+                      }
                       alt="avatar"
                       className={classes.avatar}
                     />
                   </div>
-                  <input type="file" {...register('avatar')} required />
+                  <input
+                    type="file"
+                    {...register('avatar')}
+                    onChange={handleAvatarChange}
+                    required
+                  />
                 </div>
                 <TextField
                   margin="normal"
@@ -134,32 +173,41 @@ function CreateEmployee() {
                 <TextField
                   margin="normal"
                   fullWidth
-                  id="managerEmailAddres"
-                  label="Manager Email Address"
+                  id="managerEmail"
+                  label="Manager Email"
                   type="email"
-                  name="managerEmailAddres"
-                  {...register('managerEmailAddress')}
+                  name="managerEmail"
+                  {...register('managerEmail')}
                 />
                 <FormControl required component="fieldset">
                   <FormLabel component="legend">Gender</FormLabel>
                   <RadioGroup name="gender" defaultValue="female" row>
                     <FormControlLabel
-                      value="female"
+                      value="Female"
                       control={<Radio color="primary" {...register('gender')} />}
                       label="Female"
                     />
                     <FormControlLabel
-                      value="male"
+                      value="Male"
                       control={<Radio color="primary" {...register('gender')} />}
                       label="Male"
                     />
                     <FormControlLabel
-                      value="other"
+                      value="Other"
                       control={<Radio color="primary" {...register('gender')} />}
                       label="Other"
                     />
                   </RadioGroup>
                 </FormControl>
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="marriageStatus"
+                  label="Marriage Status"
+                  name="marriageStatus"
+                  {...register('marriageStatus')}
+                  required
+                />
                 <TextField
                   margin="normal"
                   required
@@ -179,6 +227,16 @@ function CreateEmployee() {
                     />
                   </LocalizationProvider>
                 </FormControl>
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="password"
+                  label="Password"
+                  type="password"
+                  name="password"
+                  {...register('password')}
+                  required
+                />
               </Grid>
               <Grid
                 item

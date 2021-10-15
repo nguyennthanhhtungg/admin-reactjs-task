@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
@@ -20,14 +20,21 @@ import { CUSTOMER_ACTION_TYPE } from 'utils/constants';
 import { useSnackbar } from 'notistack';
 import CustomerContext, { defaultValue } from './CustomerContext';
 import CustomerReducer from './CustomerReducer';
+import EmployeeInfoDialog from '../../components/EmployeeInfoDialog/EmployeeInfoDialog';
+import CustomerInfoDialog from '../../components/CustomerInfoDialog/CustomerInfoDialog';
 
 const CustomerBodyTableRow = React.memo(({ customer, index, dispatch }) => {
   console.log('Hello CustomerBodyTableRow');
 
   const { enqueueSnackbar } = useSnackbar();
+  const [open, setOpen] = useState(false);
 
-  const handleViewCustomerDetail = () => {
-    console.log('View Customer Detail!');
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const handleLockCustomer = async () => {
@@ -73,69 +80,76 @@ const CustomerBodyTableRow = React.memo(({ customer, index, dispatch }) => {
   };
 
   return (
-    <StyledTableRow>
-      <StyledTableCell
-        component="th"
-        scope="row"
-        style={{ fontWeight: 'bolder' }}
-        align="center"
-      >
-        {index + 1}
-      </StyledTableCell>
-      <StyledTableCell align="center">{customer.customerNo}</StyledTableCell>
-      <StyledTableCell align="center">
-        <img
-          src={customer.avatarUrl}
-          alt="employeeImage"
-          style={{ width: 50, height: 50 }}
-        />
-      </StyledTableCell>
-      <StyledTableCell align="center">{customer.customerName}</StyledTableCell>
-      <StyledTableCell align="center">{customer.email}</StyledTableCell>
-      <StyledTableCell align="center">{customer.phoneNumber}</StyledTableCell>
-      <StyledTableCell align="center">
-        {customer.isLocked === false ? (
-          <LockOpenIcon color="success" fontSize="large" />
-        ) : (
-          <LockIcon color="error" fontSize="large" />
-        )}
-      </StyledTableCell>
-      <StyledTableCell align="center">
-        {/* <Button */}
-        {/*  variant="outlined" */}
-        {/*  size="small" */}
-        {/*  color="info" */}
-        {/*  style={{ margin: 5 }} */}
-        {/*  startIcon={<WebIcon fontSize="inherit" />} */}
-        {/*  onClick={handleViewCustomerDetail} */}
-        {/* > */}
-        {/*  VIEW */}
-        {/* </Button> */}
-        {customer.isLocked === false ? (
+    <>
+      <StyledTableRow>
+        <StyledTableCell
+          component="th"
+          scope="row"
+          style={{ fontWeight: 'bolder' }}
+          align="center"
+        >
+          {index + 1}
+        </StyledTableCell>
+        <StyledTableCell align="center">{customer.customerNo}</StyledTableCell>
+        <StyledTableCell align="center">
+          <img
+            src={customer.avatarUrl}
+            alt="employeeImage"
+            style={{ width: 50, height: 50 }}
+          />
+        </StyledTableCell>
+        <StyledTableCell align="center">{customer.customerName}</StyledTableCell>
+        <StyledTableCell align="center">{customer.email}</StyledTableCell>
+        <StyledTableCell align="center">{customer.phoneNumber}</StyledTableCell>
+        <StyledTableCell align="center">
+          {customer.isLocked === false ? (
+            <LockOpenIcon color="success" fontSize="large" />
+          ) : (
+            <LockIcon color="error" fontSize="large" />
+          )}
+        </StyledTableCell>
+        <StyledTableCell align="center">
           <Button
             variant="outlined"
             size="small"
-            color="warning"
+            color="info"
             style={{ margin: 5 }}
-            startIcon={<LockIcon fontSize="inherit" />}
-            onClick={handleLockCustomer}
+            startIcon={<WebIcon fontSize="inherit" />}
+            onClick={handleOpen}
           >
-            LOCK
+            VIEW
           </Button>
-        ) : (
-          <Button
-            variant="outlined"
-            size="small"
-            color="success"
-            style={{ margin: 5 }}
-            startIcon={<LockOpenIcon fontSize="inherit" />}
-            onClick={handleUnlockCustomer}
-          >
-            UNLOCK
-          </Button>
-        )}
-      </StyledTableCell>
-    </StyledTableRow>
+          {customer.isLocked === false ? (
+            <Button
+              variant="outlined"
+              size="small"
+              color="warning"
+              style={{ margin: 5 }}
+              startIcon={<LockIcon fontSize="inherit" />}
+              onClick={handleLockCustomer}
+            >
+              LOCK
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              size="small"
+              color="success"
+              style={{ margin: 5 }}
+              startIcon={<LockOpenIcon fontSize="inherit" />}
+              onClick={handleUnlockCustomer}
+            >
+              UNLOCK
+            </Button>
+          )}
+        </StyledTableCell>
+      </StyledTableRow>
+      <CustomerInfoDialog
+        customer={customer}
+        open={open}
+        handleClose={handleClose}
+      />
+    </>
   );
 });
 

@@ -17,10 +17,10 @@ import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { AppContext } from '../../contexts/AppContext';
-import axiosInstance from '../../utils/database';
+import { AppContext } from 'contexts/AppContext';
+import axiosInstance from 'utils/database';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -37,6 +37,7 @@ const useStyles = makeStyles(() => ({
 function Profile() {
   console.log('Hello Profile!');
   const classes = useStyles();
+  const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
   const { store, dispatch } = useContext(AppContext);
   const [avatar, setAvatar] = useState(null);
@@ -106,8 +107,36 @@ function Profile() {
     watch: watch2,
     formState: { errors: errors2 }
   } = useForm();
-  const onSubmitPasswordChange = (data) => {
-    console.log(data);
+  const onSubmitPasswordChange = async (data) => {
+    if (data.newPassword !== data.confirmNewPassword) {
+      enqueueSnackbar('New Password and Confirm New Password dont match!', {
+        variant: 'error'
+      });
+      return;
+    }
+
+    try {
+      const res = await axiosInstance.post(`/Auth/ChangePassword`, {
+        userId: store.employee.employeeId,
+        oldPassword: data.oldPassword,
+        newPassword: data.newPassword,
+        role: 'Employee'
+      });
+
+      enqueueSnackbar('Change password successfully!', {
+        variant: 'success'
+      });
+
+      localStorage.removeItem('isRememberMe');
+      localStorage.removeItem('employee');
+      sessionStorage.removeItem('employee');
+
+      history.push('/login');
+    } catch (err) {
+      enqueueSnackbar(err.response.data.Message, {
+        variant: 'error'
+      });
+    }
   };
 
   return (
@@ -220,7 +249,7 @@ function Profile() {
                       defaultValue={
                         store.employee.gender
                           ? store.employee.gender.split(' ').join('')
-                          : 'Gender'
+                          : 'Female'
                       }
                       row
                     >

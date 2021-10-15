@@ -15,6 +15,9 @@ import { useContext, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import Divider from '@mui/material/Divider';
 import { AppContext } from 'contexts/AppContext';
+import { useForm } from 'react-hook-form';
+import axios from 'axios';
+import axiosInstance from '../../utils/database';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -44,10 +47,28 @@ function PasswordReset() {
   const { enqueueSnackbar } = useSnackbar();
   const [isSent, setIsSent] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-  };
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors }
+  } = useForm();
+  const onSubmit = async (data) => {
+    console.log(data);
 
+    try {
+      const res = await axiosInstance.post(`/Auth/PasswordReset`, {
+        email: data.email,
+        role: 'Employee'
+      });
+
+      setIsSent(true);
+    } catch (err) {
+      enqueueSnackbar(err.response.data.Message, {
+        variant: 'error'
+      });
+    }
+  };
   return (
     <>
       <Helmet>
@@ -83,26 +104,29 @@ function PasswordReset() {
                   Forgotten your password? Enter your e-mail address below, and we'll
                   send you an e-mail allowing you to reset it.
                 </Typography>
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="email"
-                    label="E-mail address"
-                    type="email"
-                    id="email"
-                    autoFocus
-                  />
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                  >
-                    Reset My Password
-                  </Button>
-                </Box>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                  <Box sx={{ mt: 1 }}>
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      name="email"
+                      label="E-mail address"
+                      type="email"
+                      id="email"
+                      {...register('email')}
+                      autoFocus
+                    />
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      sx={{ mt: 3, mb: 2 }}
+                    >
+                      Reset My Password
+                    </Button>
+                  </Box>
+                </form>
               </>
             ) : (
               <Typography variant="subtitle1" className={classes.note}>

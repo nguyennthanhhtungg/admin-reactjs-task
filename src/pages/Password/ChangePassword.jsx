@@ -12,12 +12,13 @@ import Typography from '@mui/material/Typography';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { useSnackbar } from 'notistack';
 import Helmet from 'react-helmet';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import axiosInstance from 'utils/database';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import Divider from '@mui/material/Divider';
 import { AppContext } from 'contexts/AppContext';
+import { useForm } from 'react-hook-form';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -38,17 +39,74 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 function ChangePassword() {
   console.log('Hello ChangePassword');
+  const query = useQuery();
+  const token = query.get('token').replace(/\s/g, '+');
+  const email = query.get('email');
 
   const classes = useStyles();
   const history = useHistory();
   const { dispatch } = useContext(AppContext);
   const { enqueueSnackbar } = useSnackbar();
   const [isSucceeded, setIsSucceeded] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    async function checkResetToken() {
+      try {
+        await axiosInstance.get(
+          `/ResetTokens/CheckResetToken?token=${encodeURIComponent(
+            token
+          )}&email=${email}&role=Employee`
+        );
+      } catch (err) {
+        setIsExpired(true);
+        enqueueSnackbar(err.response.data.Message, {
+          variant: 'error'
+        });
+      }
+    }
+    checkResetToken();
+  }, []);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors }
+  } = useForm();
+  const onSubmit = async (data) => {
+    console.log(data);
+
+    if (data.newPassword !== data.confirmNewPassword) {
+      enqueueSnackbar('New Password and Confirm New Pasword dont match!', {
+        variant: 'error'
+      });
+
+      return;
+    }
+
+    try {
+      const res = await axiosInstance.post(`/Auth/ForgotPassword`, {
+        email,
+        newPassword: data.newPassword,
+        role: 'Employee'
+      });
+
+      setIsSucceeded(true);
+      enqueueSnackbar('Change password successfully!', {
+        variant: 'success'
+      });
+    } catch (err) {
+      enqueueSnackbar(err.response.data.Message, {
+        variant: 'error'
+      });
+    }
   };
 
   return (
@@ -77,43 +135,66 @@ function ChangePassword() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Change Password
+              {isExpired ? 'Bad Token' : 'Change Password'}
             </Typography>
             <Divider variant="middle" flexItem style={{ margin: 15 }} />
-            {isSucceeded === false ? (
-              <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="newPassword"
-                  label="New Password"
-                  type="password"
-                  id="newPassword"
-                  autoFocus
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="confirmNewPassword"
-                  label="Confirm New Password"
-                  type="password"
-                  id="confirmNewPassword"
-                  autoFocus
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Change Password
-                </Button>
-              </Box>
-            ) : (
+            {isSucceeded === false && isExpired === false && (
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Box sx={{ mt: 1 }}>
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="newPassword"
+                    label="New Password"
+                    type="password"
+                    id="newPassword"
+                    {...register('newPassword')}
+                    autoFocus
+                  />
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="confirmNewPassword"
+                    label="Confirm New Password"
+                    type="password"
+                    id="confirmNewPassword"
+                    {...register('confirmNewPassword')}
+                  />
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Change Password
+                  </Button>
+                </Box>
+              </form>
+            )}
+            {isSucceeded === true && (
               <Typography variant="subtitle1" className={classes.note}>
-                Your password is now changed.
+                Your password is now changed{' '}
+                <Link to="/login" style={{ textDecoration: 'none' }}>
+                  {' '}
+                  Login Now
+                </Link>
+                .
+              </Typography>
+            )}
+            {isExpired === true && (
+              <Typography variant="subtitle1" className={classes.note}>
+                The password reset link was invalid, possibly because it has already
+                been used. Please request a{' '}
+                <Link
+                  to="/password/passwordReset"
+                  style={{ textDecoration: 'none' }}
+                >
+                  {' '}
+                  new password reset
+                </Link>
+                .
               </Typography>
             )}
           </Box>
