@@ -19,9 +19,109 @@ import numberWithCommas from 'utils/currency';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import Skeleton from '@mui/material/Skeleton';
-import Box from '@mui/material/Box';
 import { StyledTableCell, StyledTableRow } from 'components/StyledTable/StyledTable';
 import { AppContext } from 'contexts/AppContext';
+import Badge from '@mui/material/Badge';
+import { useSnackbar } from 'notistack';
+import Comment from 'components/Comment/Comment';
+import CommentIcon from '@mui/icons-material/Comment';
+import IconButton from '@mui/material/IconButton';
+
+const ProductBodyTableRow = React.memo(({ number, product }) => {
+  console.log('Hello ProductBodyTableRow');
+
+  const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
+  const [open, setOpen] = React.useState(false);
+  const [newCommentNumber, setNewCommentNumber] = useState(0);
+
+  useEffect(() => {
+    async function loadNewCommentList() {
+      try {
+        const res = await axiosInstance.get(
+          `/Comments/CommentListWithCustomerByProductIdAndStatus?productId=${product.productId}&status=NEW`
+        );
+
+        if (res.status === 200) {
+          setNewCommentNumber(res.data.length);
+        }
+      } catch (err) {
+        enqueueSnackbar(err.response.data.Message, { variant: 'error' });
+      }
+    }
+
+    loadNewCommentList();
+  }, []);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <StyledTableRow>
+        <StyledTableCell component="th" scope="row" style={{ fontWeight: 'bolder' }}>
+          {number}
+        </StyledTableCell>
+        <StyledTableCell align="center">{product.productCode}</StyledTableCell>
+        <StyledTableCell align="center">
+          <img
+            src={product.imageUrl}
+            alt="productImage"
+            style={{ width: 50, height: 50 }}
+          />
+        </StyledTableCell>
+        <StyledTableCell align="left">{product.productName}</StyledTableCell>
+        <StyledTableCell align="center">
+          {product.category.categoryName}
+        </StyledTableCell>
+        <StyledTableCell align="center">
+          {product.supplier.supplierName}
+        </StyledTableCell>
+        <StyledTableCell align="center">
+          {numberWithCommas(product.price)}
+        </StyledTableCell>
+        <StyledTableCell align="center">{product.discount}</StyledTableCell>
+        <StyledTableCell align="center">
+          <Button
+            variant="outlined"
+            size="small"
+            color="warning"
+            style={{ margin: 5 }}
+            startIcon={<EditIcon fontSize="inherit" />}
+            onClick={() => history.push(`/products/${product.productId}`)}
+          >
+            EDIT
+          </Button>
+          <Button
+            variant="outlined"
+            type="link"
+            size="small"
+            href={`${process.env.REACT_APP_REACTJS_WEBSITE}/product/${product.productId}`}
+            target="_blank"
+            color="info"
+            style={{ margin: 5 }}
+            startIcon={<WebIcon fontSize="inherit" />}
+          >
+            VIEW
+          </Button>
+          <IconButton>
+            <Badge badgeContent={newCommentNumber} color="info">
+              <CommentIcon color="success" onClick={handleClickOpen} />
+            </Badge>
+          </IconButton>
+        </StyledTableCell>
+      </StyledTableRow>
+      <Comment open={open} handleClose={handleClose} product={product} />
+    </>
+  );
+});
+
+ProductBodyTableRow.displayName = 'ProductBodyTableRow';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -107,6 +207,7 @@ function Products() {
     setRowsPerPage(10);
     await loadProductListByParameters(search, selectedCategory);
   };
+
   return (
     <>
       <Helmet>
@@ -240,66 +341,11 @@ function Products() {
                 productListByParameters
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((product, index) => (
-                    <StyledTableRow key={product.productId}>
-                      <StyledTableCell
-                        component="th"
-                        scope="row"
-                        style={{ fontWeight: 'bolder' }}
-                      >
-                        {page * rowsPerPage + index + 1}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {product.productCode}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <img
-                          src={product.imageUrl}
-                          alt="productImage"
-                          style={{ width: 50, height: 50 }}
-                        />
-                      </StyledTableCell>
-                      <StyledTableCell align="left">
-                        {product.productName}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {product.category.categoryName}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {product.supplier.supplierName}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {numberWithCommas(product.price)}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {product.discount}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          color="warning"
-                          style={{ margin: 5 }}
-                          startIcon={<EditIcon fontSize="inherit" />}
-                          onClick={() =>
-                            history.push(`/products/${product.productId}`)
-                          }
-                        >
-                          EDIT
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          type="link"
-                          size="small"
-                          href={`${process.env.REACT_APP_REACTJS_WEBSITE}/product/${product.productId}`}
-                          target="_blank"
-                          color="info"
-                          style={{ margin: 5 }}
-                          startIcon={<WebIcon fontSize="inherit" />}
-                        >
-                          VIEW
-                        </Button>
-                      </StyledTableCell>
-                    </StyledTableRow>
+                    <ProductBodyTableRow
+                      key={product.productId}
+                      number={page * rowsPerPage + index + 1}
+                      product={product}
+                    />
                   ))}
             </TableBody>
             <TableFooter>
